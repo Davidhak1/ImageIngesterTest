@@ -28,15 +28,15 @@ Feature: Login into Application
     Examples:
       |oem    |status |
       |bmw    |initial|
-#      |aoa    |initial|
+      |aoa    |initial|
 
 #Manually we can also check if the message exists in the queue or not
 
 #----------------------------------------------------------------------------------------------------------------------------
 
 
-  @bmw_smoke
   @second
+  @bmw_smoke
   Scenario Outline: Validating the queue and the timestamp for vehicles that have the same VIN already existing in the db with status none and partial
   Automated: no
     Given Initialize the browser with chrome
@@ -65,17 +65,17 @@ Feature: Login into Application
     Examples:
     |oem    |status   |
     |bmw    |none     |
-#    |bmw    |partial  |
-#    |aoa    |none     |
-#    |aoa    |partial  |
+    |bmw    |partial  |
+    |aoa    |none     |
+    |aoa    |partial  |
 
 
 #Manually we can also check if the message exists in the queue or not
 
   #----------------------------------------------------------------------------------------------------------------------------
 
+  @third
   @bmw_smoke
-    @third
   Scenario Outline: Test validating the queue and the timestamp for vehicles that already exist in the db with status complete
     Given Initialize the browser with chrome
     And Get a random <oem> vehicle with <status> and Not removed
@@ -97,12 +97,12 @@ Feature: Login into Application
     Examples:
       |oem |status     |
       |bmw |complete   |
-#      |aoa |complete   |
+      |aoa |complete   |
 
 #----------------------------------------------------------------------------------------------------------------------------
 
+  @fourth
   @bmw_smoke
-    @fourth
   Scenario Outline:  Test validating the queue and the timestamp for vehicles that already exist in the db with all statuses and Force Refreshed
     Given Initialize the browser with chrome
     And Get a random <oem> vehicle with <status> and Not removed
@@ -129,18 +129,17 @@ Feature: Login into Application
     Examples:
       |oem    |status   |statusExpected  |
       |bmw    |initial  |initial         |
-#      |bmw    |none     |initial         |
-#      |bmw    |partial  |initial         |
-#      |bmw    |complete |initial         |
-#      |aoa    |initial  |initial         |
-#      |aoa    |none     |initial         |
-#      |aoa    |partial  |initial         |
-#      |aoa    |complete |initial         |
+      |bmw    |none     |initial         |
+      |bmw    |partial  |initial         |
+      |bmw    |complete |initial         |
+      |aoa    |initial  |initial         |
+      |aoa    |none     |initial         |
+      |aoa    |partial  |initial         |
+      |aoa    |complete |initial         |
 #----------------------------------------------------------------------------------------------------------------------------
 
-
-  @bmw_smoke
   @fifth
+  @bmw_smoke
   Scenario Outline: Validating if all the images are mapped to new items that have VINs already existing in the db with completed or partial solutions
     Given Initialize the browser with chrome
     And Get a random <oem> vehicle with <status> and Not removed
@@ -162,7 +161,7 @@ Feature: Login into Application
     Examples:
       |oem    |status   |
       |bmw    |partial  |
-#      |bmw    |complete|
-#      |aoa    |partial  |
-#      |aoa    |complete|
+      |bmw    |complete |
+      |aoa    |partial  |
+      |aoa    |complete |
 #----------------------------------------------------------------------------------------------------------------------------

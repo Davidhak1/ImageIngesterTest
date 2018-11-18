@@ -72,18 +72,30 @@ import org.openqa.selenium.WebElement;
         public WebElement getImageActionLowQueue(){return driver.findElement(image_action_low_priority_queue);}
 
         public int getReadyMessageCountInt(){
-            while(driver.findElements(readyMessagesString).size()==0)
+//            while(driver.findElements(readyMessagesString).size()==0)
+//            {
+//                try {
+//                    Thread.sleep(1000);
+//                }catch(Exception e)
+//                {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+            boolean flag=false;
+            String str = null;
+            while(flag==false)
             {
-                try {
-                    Thread.sleep(100);
-                }catch(Exception e)
-                {
-                    e.printStackTrace();
+                try{
+                    WebElement el = driver.findElement(readyMessagesString);
+                     str = el.getText();
+                     flag=true;
+                }catch (Exception e){
+                    flag=false;
                 }
 
             }
-            WebElement el = driver.findElement(readyMessagesString);
-            String str = el.getText();
+
             int number = Integer.parseInt(str.replaceAll("\\D+",""));
             return number;
         }

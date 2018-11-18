@@ -163,7 +163,9 @@ public class stepDefinition extends base {
 
         log.debug("Filling the headers and props to publish a message....");
 
+        Thread.sleep(500);
         rmq.getPublishMessageLink().click();
+        Thread.sleep(500);
 
         Select dropdown = new Select(rmq.getDeliveryMode());
         dropdown.selectByValue("2");
