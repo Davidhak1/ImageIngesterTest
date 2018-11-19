@@ -24,6 +24,7 @@ Feature: Login into Application
     And Query myVehicle again
     And The next_scheduled_date of the item should be greater but no more than 1 hours
     And close the browser
+    And set the removed flag to true for myVehicle
 
     Examples:
       |oem    |status |
@@ -52,22 +53,24 @@ Feature: Login into Application
     And fill in the payload with the <oem> vin and new uuid
     And publish the message and wait for three seconds
     Then The new item should exist in the vehicle table and the status should be <status>
-    And The next_scheduled_date of the new item should be between 6-7 days from now
+    And The next_scheduled_date of the new item should be between 6-8 days from now
     And change the next-shchedule_date to the current date
     And Go to queues
     And Choose image-action-low-priority queue
     And Wait until the number of messages in the queue changes
     And Query myVehicle again
-    And The next_scheduled_date of the new item should be between 6-7 days from now
+    And The next_scheduled_date of the new item should be between 6-8 days from now
     And close the browser
+    And set the removed flag to true for myVehicle
+
 
 
     Examples:
     |oem    |status   |
     |bmw    |none     |
     |bmw    |partial  |
-    |aoa    |none     |
-    |aoa    |partial  |
+#    |aoa    |none     |
+#    |aoa    |partial  |
 
 
 #Manually we can also check if the message exists in the queue or not
@@ -92,12 +95,14 @@ Feature: Login into Application
     Then The new item should exist in the vehicle table and the status should be <status>
     And The next_scheduled_date of the new item should be more than 1000 years
     And close the browser
+    And set the removed flag to true for myVehicle
+
 
 
     Examples:
       |oem |status     |
       |bmw |complete   |
-      |aoa |complete   |
+#      |aoa |complete   |
 
 #----------------------------------------------------------------------------------------------------------------------------
 
@@ -124,18 +129,20 @@ Feature: Login into Application
     And Query myVehicle again
     And The next_scheduled_date of the item should be greater but no more than 1 hours
     And close the browser
+    And set the removed flag to true for myVehicle
+
 
 
     Examples:
       |oem    |status   |statusExpected  |
-      |bmw    |initial  |initial         |
-      |bmw    |none     |initial         |
-      |bmw    |partial  |initial         |
-      |bmw    |complete |initial         |
-      |aoa    |initial  |initial         |
-      |aoa    |none     |initial         |
-      |aoa    |partial  |initial         |
-      |aoa    |complete |initial         |
+#      |bmw    |initial  |initial         |
+#      |bmw    |none     |initial         |
+#      |bmw    |partial  |initial         |
+#      |bmw    |complete |initial         |
+#      |aoa    |initial  |initial         |
+#      |aoa    |none     |initial         |
+#      |aoa    |partial  |initial         |
+#      |aoa    |complete |initial         |
 #----------------------------------------------------------------------------------------------------------------------------
 
   @fifth
@@ -156,12 +163,14 @@ Feature: Login into Application
     Then The new item should exist in the vehicle table and the status should be <status>
     And Vehicles with old and new uuids and should have have equal number of images mapped
     And close the browser
+    And set the removed flag to true for myVehicle
+
 
 
     Examples:
       |oem    |status   |
       |bmw    |partial  |
       |bmw    |complete |
-      |aoa    |partial  |
-      |aoa    |complete |
+#      |aoa    |partial  |
+#      |aoa    |complete |
 #----------------------------------------------------------------------------------------------------------------------------

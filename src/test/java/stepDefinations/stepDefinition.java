@@ -168,6 +168,7 @@ public class stepDefinition extends base {
         Thread.sleep(500);
 
         Select dropdown = new Select(rmq.getDeliveryMode());
+        Thread.sleep(500);
         dropdown.selectByValue("2");
         rmq.getheader1key().sendKeys(prop.getProperty("RMQ_headers1_key"));
         rmq.getheader1value().sendKeys(prop.getProperty("RMQ_headers1_value"));
@@ -244,13 +245,17 @@ public class stepDefinition extends base {
 
         log.debug("publishing the message to the queue..."+", uuid:"+ this.uuid);
         rmq.getPublish().click();
-	    Thread.sleep(2000);
     }
 
 	@Then("^The new item should exist in the vehicle table and the status should be (.+)$")
 	public void the_new_item_should_exist_in_the_vehicle_table_and_the_status_should_be_status(String status) throws Throwable {
 
         log.debug("Asserting if the new item exists in the MySQL 'vehicle' table"+", uuid:"+ this.uuid);
+        try{
+            Thread.sleep(1000);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         myVehicle = q.getVehicleByUUID(this.uuid);
         Assert.assertTrue(myVehicle!=null, "There is no Vehicle with the uuid "+ this.uuid);
         Assert.assertEquals((myVehicle.getStatus().toLowerCase()),status, "Status should be "+status+", but it's " + myVehicle.getStatus()+", uuid:"+ this.uuid );
@@ -278,17 +283,24 @@ public class stepDefinition extends base {
         log.info("inside method");
 
         int initialMessageCount = rmq.getReadyMessageCountInt();
+
+           Assert.assertEquals(initialMessageCount,0,"There are more than 0 messages in the queue ( which was purged)");
+
         int count = 0;
+        int messageCount=initialMessageCount;
+
         //We wait until the count of messages in the queue changes
         log.info("Waiting until the number of masseges in the queue updates"+", uuid:"+ this.uuid);
-        while(rmq.getReadyMessageCountInt() == initialMessageCount && count < 30)
+        while(messageCount == initialMessageCount && count < 240)
         {
-            initialMessageCount = rmq.getReadyMessageCountInt();
-            Thread.sleep(2000);
+            messageCount = rmq.getReadyMessageCountInt();
             count++;
+            Thread.sleep(500);
+
         }
 
-        System.out.println(initialMessageCount);
+        Assert.assertTrue(count<240,"It didn't update the queue within 1m:15s interval");
+        log.info("It took "+ count/2 + " secs to update the # of messages in the queue, and there are "+messageCount+" messages ");
 
 	}
 
@@ -375,5 +387,9 @@ public class stepDefinition extends base {
 
     }
 
+    @Then("^set the removed flag to true for myVehicle$")
+    public void set_the_removed_flag_to_true_for_myvehicle() throws Throwable {
+        q.updateVehicleSetRemovedToTrue(uuid);
+    }
 
 }

@@ -8,7 +8,7 @@ import org.openqa.selenium.WebElement;
 
 
     public class RabbitMQSite {
-
+    static int count=0;
 
         public WebDriver driver;
 
@@ -72,31 +72,29 @@ import org.openqa.selenium.WebElement;
         public WebElement getImageActionLowQueue(){return driver.findElement(image_action_low_priority_queue);}
 
         public int getReadyMessageCountInt(){
-//            while(driver.findElements(readyMessagesString).size()==0)
-//            {
-//                try {
-//                    Thread.sleep(1000);
-//                }catch(Exception e)
-//                {
-//                    e.printStackTrace();
-//                }
 //
-//            }
             boolean flag=false;
             String str = null;
-            while(flag==false)
+
+            while(flag!=true)
             {
                 try{
+
                     WebElement el = driver.findElement(readyMessagesString);
                      str = el.getText();
                      flag=true;
                 }catch (Exception e){
-                    flag=false;
+
                 }
 
             }
 
             int number = Integer.parseInt(str.replaceAll("\\D+",""));
+            System.out.println(++count + ") Returning number: "+number);
+            if(count%10==0)
+            {
+                System.out.println("-----------------------------------------------");
+            }
             return number;
         }
 

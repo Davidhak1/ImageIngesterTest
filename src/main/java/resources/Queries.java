@@ -258,6 +258,33 @@ public class Queries {
 
     }
 
+    public int updateVehicleSetRemovedToTrue(String uuid) {
+
+        Statement stmt = mysqlCon.getStatement();
+        int response=0;
+        try {
+            log.debug("Querying vehicle table, setting removed column to true for uuid: "+ uuid);
+            response = stmt.executeUpdate("update vehicle set removed = true where uuid ='"+uuid+"';");
+            log.info("The query effected "+ response + "raws");
+
+            if(response <1)
+            {
+                System.out.println("The Query to set the removed column to true for uuid: +"+ uuid +" didn't effect any rows");
+                log.error("The Query to set the removed column to true for uuid: +"+ uuid +" didn't effect any rows");
+            }
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+            return response;
+        }
+
+    }
+
+
     public int getNumberOfImagesMappedToVehicleByUuid(String uuid){
 
         Statement stmt = mysqlCon.getStatement();
