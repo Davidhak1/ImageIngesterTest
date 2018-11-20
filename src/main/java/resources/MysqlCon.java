@@ -37,15 +37,6 @@ class MysqlCon{
              return stmt;
 
 
-//             ResultSet rs=stmt.executeQuery("select uuid from vehicle");
-//            while(rs.next())
-//                System.out.println(rs.getString(1));
-//
-//            ResultSet rs1 = stmt.executeQuery("select count(uuid) from vehicle");
-//            while(rs1.next())
-//                System.out.println(rs1.getInt(1));
-//
-//            con.close();
         }catch(Exception e){ System.out.println(e);}
 
         return null;

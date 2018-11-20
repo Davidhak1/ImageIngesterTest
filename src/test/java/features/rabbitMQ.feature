@@ -1,9 +1,8 @@
-Feature: Login into Application
+Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
   @bmw_smoke
   @first
   Scenario Outline: Validating the queue and the timestamp for vehicles that have the same VIN already existing in the db with status initial
-    Automated: no
     Given Initialize the browser with chrome
     And Get a random <oem> vehicle with <status> and Not removed
     And Set the next_schedyled timestamp to NULL for those who are not NULL
@@ -69,8 +68,8 @@ Feature: Login into Application
     |oem    |status   |
     |bmw    |none     |
     |bmw    |partial  |
-#    |aoa    |none     |
-#    |aoa    |partial  |
+    |aoa    |none     |
+    |aoa    |partial  |
 
 
 #Manually we can also check if the message exists in the queue or not
@@ -102,7 +101,7 @@ Feature: Login into Application
     Examples:
       |oem |status     |
       |bmw |complete   |
-#      |aoa |complete   |
+      |aoa |complete   |
 
 #----------------------------------------------------------------------------------------------------------------------------
 
@@ -135,14 +134,14 @@ Feature: Login into Application
 
     Examples:
       |oem    |status   |statusExpected  |
-#      |bmw    |initial  |initial         |
-#      |bmw    |none     |initial         |
-#      |bmw    |partial  |initial         |
-#      |bmw    |complete |initial         |
-#      |aoa    |initial  |initial         |
-#      |aoa    |none     |initial         |
-#      |aoa    |partial  |initial         |
-#      |aoa    |complete |initial         |
+      |bmw    |initial  |initial         |
+      |bmw    |none     |initial         |
+      |bmw    |partial  |initial         |
+      |bmw    |complete |initial         |
+      |aoa    |initial  |initial         |
+      |aoa    |none     |initial         |
+      |aoa    |partial  |initial         |
+      |aoa    |complete |initial         |
 #----------------------------------------------------------------------------------------------------------------------------
 
   @fifth
@@ -171,6 +170,6 @@ Feature: Login into Application
       |oem    |status   |
       |bmw    |partial  |
       |bmw    |complete |
-#      |aoa    |partial  |
-#      |aoa    |complete |
+      |aoa    |partial  |
+      |aoa    |complete |
 #----------------------------------------------------------------------------------------------------------------------------

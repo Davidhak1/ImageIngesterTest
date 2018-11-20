@@ -284,7 +284,6 @@ public class Queries {
 
     }
 
-
     public int getNumberOfImagesMappedToVehicleByUuid(String uuid){
 
         Statement stmt = mysqlCon.getStatement();
