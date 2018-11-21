@@ -15,9 +15,10 @@ import com.cucumber.listener.Reporter;
 @CucumberOptions(
 		features = "src/test/java/features",
 		glue="stepDefinations",
-		tags = {"@bmw_smoke"},
+		tags = {"@second"},
 //		plugin={"html:target/cucumber-html-report","pretty"}
-		plugin={"com.cucumber.listener.ExtentCucumberFormatter:target/html/report.html"}
+		plugin={"com.cucumber.listener.ExtentCucumberFormatter:target/html/report.html"},
+		monochrome = true
 )
 public class TestRunner extends AbstractTestNGCucumberTests  {
 	@AfterClass

@@ -41,6 +41,7 @@ import org.openqa.selenium.WebElement;
         By delete_purge = By.xpath("//h2[text()='Delete / purge']");
 
         By purgeQueue = By.cssSelector("input[value='Purge']");
+        By aletCloseButton = By.xpath("//div[@class='form-popup-info']/span[text()='Close']");
 
         public RabbitMQSite(WebDriver driver) {
 
@@ -144,6 +145,7 @@ import org.openqa.selenium.WebElement;
         public WebElement getDeletePurgeLink(){return driver.findElement(delete_purge);}
         public WebElement getPurgeQueue(){return driver.findElement(purgeQueue);}
 
+        public WebElement getAlertCloseButton(){return driver.findElement(aletCloseButton);}
 
 
 

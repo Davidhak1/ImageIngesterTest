@@ -9,6 +9,7 @@ import cucumber.api.java.en.When;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -89,8 +90,8 @@ public class stepDefinition extends base {
         rmq.getqueueTab().click();
 	}
 
-	@Given("^Set the next_schedyled timestamp to NULL for those who are not NULL$")
-    public void set_the_nextschedyled_timestamp_to_null_for_those_who_are_not_null() throws Throwable {
+	@Given("^Set the next_scheduled timestamp to NULL for those who are not NULL$")
+    public void set_the_nextscheduled_timestamp_to_null_for_those_who_are_not_null() throws Throwable {
 
        int response = q.updateVehicleSetNextSchedulesToNull();
        if(response<1)
@@ -105,6 +106,7 @@ public class stepDefinition extends base {
         log.debug("Going to low-priority queue");
         rmq.getImageActionLowQueue().click();
 
+        if(myVehicle==null)
         log.debug("Clicking on deletePurgeLink");
         rmq.getDeletePurgeLink().click();
         log.debug("Clicking on purge button");
@@ -165,10 +167,9 @@ public class stepDefinition extends base {
 
         Thread.sleep(500);
         rmq.getPublishMessageLink().click();
-        Thread.sleep(500);
 
         Select dropdown = new Select(rmq.getDeliveryMode());
-        Thread.sleep(500);
+        Thread.sleep(1000);
         dropdown.selectByValue("2");
         rmq.getheader1key().sendKeys(prop.getProperty("RMQ_headers1_key"));
         rmq.getheader1value().sendKeys(prop.getProperty("RMQ_headers1_value"));
@@ -272,6 +273,7 @@ public class stepDefinition extends base {
 
         log.debug("Asserting if the new item's timestamp is less than an hour"+", uuid:"+ this.uuid);
 
+//        Thread.sleep(2000);
         Assert.assertTrue(myVehicle.getNext_scheduled_on()!=null,"there is no next-Scheduled_on timestamp created"+", uuid:"+ this.uuid);
         Assert.assertTrue((myVehicle.getNext_scheduled_on().isBefore(upperBoundDate)), "the next_scheduled timestamp is not within "+hours +" hours"+", uuid:"+ this.uuid);
 
@@ -280,18 +282,17 @@ public class stepDefinition extends base {
 
 	@Then("^Wait until the number of messages in the queue changes$")
 	public void wait_until_the_number_of_messages_in_the_queue_changes() throws Throwable {
-        log.info("inside method");
 
         int initialMessageCount = rmq.getReadyMessageCountInt();
 
-           Assert.assertEquals(initialMessageCount,0,"There are more than 0 messages in the queue ( which was purged)");
+//           Assert.assertEquals(initialMessageCount,0,"There are more than 0 messages in the queue ( which was purged)");
 
         int count = 0;
         int messageCount=initialMessageCount;
 
-        //We wait until the count of messages in the queue changes
+        //We wait until the count of messages in the queue changes until 2 mins
         log.info("Waiting until the number of masseges in the queue updates"+", uuid:"+ this.uuid);
-        while(messageCount == initialMessageCount && count < 240)
+        while(messageCount == initialMessageCount && count < 360)
         {
             messageCount = rmq.getReadyMessageCountInt();
             count++;
@@ -299,11 +300,32 @@ public class stepDefinition extends base {
 
         }
 
-        Assert.assertTrue(count<240,"It didn't update the queue within 1m:15s interval");
+        Assert.assertTrue(count<360,"It didn't update the queue within "+count/2+"interval");
         log.info("It took "+ count/2 + " secs to update the # of messages in the queue, and there are "+messageCount+" messages ");
 
 	}
 
+    @And("^Wait until the number of messages in the queue is 1$")
+    public void wait_until_the_number_of_messages_in_the_queue_is_1() throws Throwable {
+        int messageCount = rmq.getReadyMessageCountInt();
+        int waitingTime = 360;
+        int count = 0;
+
+        //We wait until the count of messages in the queue is 1 until 2 mins, 3mins
+        log.info("Waiting until the number of masseges in the queue updates"+", uuid:"+ this.uuid);
+        while(messageCount == 0 && count < waitingTime)
+        {
+            messageCount = rmq.getReadyMessageCountInt();
+            count++;
+            if(count>100)
+                driver.navigate().refresh();
+            Thread.sleep(500);
+
+        }
+
+        Assert.assertTrue(count<waitingTime,"It didn't update the queue within "+count/2+" seconds interval");
+        log.info("It took "+ count/2 + " secs to update the # of messages in the queue, and there are "+messageCount+" messages ");
+    }
 
     @Then("^The next_scheduled_date of the new item should be between (\\d+)-(\\d+) days from now$")
     public void the_next_scheduled_date_of_the_new_item_should_be_between_days_from_now(int day1, int day2) throws Throwable {
@@ -313,9 +335,15 @@ public class stepDefinition extends base {
         LocalDateTime currDate = LocalDateTime.now();
 
         log.debug("Asserting if the new item's timestamp is in between "+day1+" - "+day2 + " days"+", uuid:"+ this.uuid);
+        log.info("The new timestamp date is "+ myDate + "==="+ myVehicle.getNext_scheduled_on());
 
-        Assert.assertTrue((myDate.isAfter(currDate.plusDays(day1)) && myDate.isBefore(currDate.plusDays(day2))),
-                "the next_scheduled_date of our vehicle is not within "+day1+" - "+day2+ " days."+", uuid:"+ this.uuid);
+        System.out.println("The new timestamp date is "+ myDate +"==="+myVehicle.getNext_scheduled_on());
+//        Assert.assertTrue((myDate.isAfter(currDate.plusDays(day1)) && myDate.isBefore(currDate.plusDays(day2))),
+//                "the next_scheduled_date of our vehicle is not within "+day1+" - "+day2+ " days."+", uuid:"+ this.uuid+"\n but it " +
+//                        "is on "+ myVehicle.getNext_scheduled_on());
+        Assert.assertTrue(myDate.isAfter(currDate.plusDays(day1)), "Is after error, should be "+currDate.plusDays(day1)+" should be before my date = "+ myDate);
+        Assert.assertTrue(myDate.isBefore(currDate.plusDays(day2)),"is before error, should be"+currDate.plusDays(day2)+ " should be after than my date = "+ myDate);
+
 
     }
 
@@ -337,7 +365,7 @@ public class stepDefinition extends base {
     }
 
     @Then ("^The next_scheduled_date of the new item should be more than (\\d+) years$")
-    public void the_next_schedyled_date_of_the_new_vehicle_should_be_more_than_x_years(int years){
+    public void the_next_scheduled_date_of_the_new_vehicle_should_be_more_than_x_years(int years){
         
 
         LocalDateTime currDate = LocalDateTime.now();
@@ -391,5 +419,27 @@ public class stepDefinition extends base {
     public void set_the_removed_flag_to_true_for_myvehicle() throws Throwable {
         q.updateVehicleSetRemovedToTrue(uuid);
     }
+
+    @And("^wait for (\\d+) seconds$")
+    public void wait_for_3_seconds(int seconds) throws Throwable {
+        Thread.sleep(seconds * 1000);
+
+    }
+
+    @And("^Purge the queue$")
+    public void purge_the_queue() throws Throwable {
+        log.debug("Clicking on purge button");
+        rmq.getPurgeQueue().click();
+    }
+
+    @And("^close the alert tab and scroll up$")
+    public void press_close_and_scroll_up() throws Throwable {
+        rmq.getAlertCloseButton().click();
+
+        WebElement element = driver.findElement(By.id("header"));
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        js.executeScript("arguments[0].scrollIntoView();", element);
+    }
+
 
 }

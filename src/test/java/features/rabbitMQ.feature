@@ -1,25 +1,28 @@
 Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
-  @bmw_smoke
-  @first
-  Scenario Outline: Validating the queue and the timestamp for vehicles that have the same VIN already existing in the db with status initial
+  Background:
     Given Initialize the browser with chrome
-    And Get a random <oem> vehicle with <status> and Not removed
-    And Set the next_schedyled timestamp to NULL for those who are not NULL
+    And Set the next_scheduled timestamp to NULL for those who are not NULL
     And Navigate to "http://vtqase-platrabbitmq01.dyn.dealer.ddc:15672/#/channels"
     When User enters username and password and logs in
+    And generate a new uuid
     And Go to queues
     And Purge high and low priority queues
     And Choose image-action-queue
     And set the generic headers and properties for the publish
-    And generate a new uuid
+
+  @bmw_smoke
+  @first
+  Scenario Outline: Validating the queue and the timestamp for vehicles that have the same VIN already existing in the db with status initial
+
+    And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid
     And publish the message and wait for three seconds
     Then The new item should exist in the vehicle table and the status should be <status>
     And The next_scheduled_date of the new item should be less than 1 hour
     And Go to queues
     And Choose image-action-high-priority queue
-    And Wait until the number of messages in the queue changes
+    And Wait until the number of messages in the queue is 1
     And Query myVehicle again
     And The next_scheduled_date of the item should be greater but no more than 1 hours
     And close the browser
@@ -38,25 +41,19 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
   @second
   @bmw_smoke
   Scenario Outline: Validating the queue and the timestamp for vehicles that have the same VIN already existing in the db with status none and partial
-  Automated: no
-    Given Initialize the browser with chrome
+
     And Get a random <oem> vehicle with <status> and Not removed
-    And Set the next_schedyled timestamp to NULL for those who are not NULL
-    And Navigate to "http://vtqase-platrabbitmq01.dyn.dealer.ddc:15672/#/channels"
-    When User enters username and password and logs in
-    And Go to queues
-    And Purge high and low priority queues
-    And Choose image-action-queue
-    And set the generic headers and properties for the publish
-    And generate a new uuid
     And fill in the payload with the <oem> vin and new uuid
     And publish the message and wait for three seconds
     Then The new item should exist in the vehicle table and the status should be <status>
     And The next_scheduled_date of the new item should be between 6-8 days from now
-    And change the next-shchedule_date to the current date
     And Go to queues
     And Choose image-action-low-priority queue
-    And Wait until the number of messages in the queue changes
+    And Purge the queue
+    And close the alert tab and scroll up
+    And change the next-shchedule_date to the current date
+    And Wait until the number of messages in the queue is 1
+    And wait for 3 seconds
     And Query myVehicle again
     And The next_scheduled_date of the new item should be between 6-8 days from now
     And close the browser
@@ -68,8 +65,21 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     |oem    |status   |
     |bmw    |none     |
     |bmw    |partial  |
-    |aoa    |none     |
-    |aoa    |partial  |
+#    |aoa    |none     |
+#    |aoa    |partial  |
+#    |bmw    |none     |
+#    |bmw    |partial  |
+#    |aoa    |none     |
+#    |aoa    |partial  |
+#    |bmw    |none     |
+#    |bmw    |partial  |
+#    |aoa    |none     |
+#    |aoa    |partial  |
+#    |bmw    |none     |
+#    |bmw    |partial  |
+#    |aoa    |none     |
+#    |aoa    |partial  |
+
 
 
 #Manually we can also check if the message exists in the queue or not
@@ -78,16 +88,9 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
   @third
   @bmw_smoke
-  Scenario Outline: Test validating the queue and the timestamp for vehicles that already exist in the db with status complete
-    Given Initialize the browser with chrome
+  Scenario Outline: Test validating the queue and the timestamp for vehicles that already exist in the db with status complete Not Force
+
     And Get a random <oem> vehicle with <status> and Not removed
-    And Set the next_schedyled timestamp to NULL for those who are not NULL
-    And Navigate to "http://vtqase-platrabbitmq01.dyn.dealer.ddc:15672/#/channels"
-    When User enters username and password and logs in
-    And Go to queues
-    And Purge high and low priority queues
-    And Choose image-action-queue
-    And set the generic headers and properties for the publish
     And generate a new uuid
     And fill in the payload with the <oem> vin and new uuid
     And publish the message and wait for three seconds
@@ -108,23 +111,15 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
   @fourth
   @bmw_smoke
   Scenario Outline:  Test validating the queue and the timestamp for vehicles that already exist in the db with all statuses and Force Refreshed
-    Given Initialize the browser with chrome
+
     And Get a random <oem> vehicle with <status> and Not removed
-    And Set the next_schedyled timestamp to NULL for those who are not NULL
-    And Navigate to "http://vtqase-platrabbitmq01.dyn.dealer.ddc:15672/#/channels"
-    When User enters username and password and logs in
-    And Go to queues
-    And Purge high and low priority queues
-    And Choose image-action-queue
-    And set the generic headers and properties for the publish
-    And generate a new uuid
     And fill in the payload with the <oem> vin and new uuid with force refresh
     And publish the message and wait for three seconds
     Then The new item should exist in the vehicle table and the status should be <statusExpected>
     And The next_scheduled_date of the new item should be less than 1 hour
     And Go to queues
     And Choose image-action-high-priority queue
-    And Wait until the number of messages in the queue changes
+    And Wait until the number of messages in the queue is 1
     And Query myVehicle again
     And The next_scheduled_date of the item should be greater but no more than 1 hours
     And close the browser
@@ -147,16 +142,8 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
   @fifth
   @bmw_smoke
   Scenario Outline: Validating if all the images are mapped to new items that have VINs already existing in the db with completed or partial solutions
-    Given Initialize the browser with chrome
+
     And Get a random <oem> vehicle with <status> and Not removed
-    And Set the next_schedyled timestamp to NULL for those who are not NULL
-    And Navigate to "http://vtqase-platrabbitmq01.dyn.dealer.ddc:15672/#/channels"
-    When User enters username and password and logs in
-    And Go to queues
-    And Purge high and low priority queues
-    And Choose image-action-queue
-    And set the generic headers and properties for the publish
-    And generate a new uuid
     And fill in the payload with the <oem> vin and new uuid
     And publish the message and wait for three seconds
     Then The new item should exist in the vehicle table and the status should be <status>
