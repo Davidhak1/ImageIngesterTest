@@ -17,14 +17,14 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid
-    And publish the message and wait for three seconds
+    And publish the message and wait for 3 seconds
     Then The new item should exist in the vehicle table and the status should be <status>
     And The next_scheduled_date of the new item should be less than 1 hour
     And Go to queues
     And Choose image-action-high-priority queue
     And Wait until the number of messages in the queue is 1
     And Query myVehicle again
-    And The next_scheduled_date of the item should be greater but no more than 1 hours
+    And The next_scheduled_date of the item should be greater than now but no more than 1 hours
     And close the browser
     And set the removed flag to true for myVehicle
 
@@ -44,7 +44,7 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid
-    And publish the message and wait for three seconds
+    And publish the message and wait for 3 seconds
     Then The new item should exist in the vehicle table and the status should be <status>
     And The next_scheduled_date of the new item should be between 6-8 days from now
     And Go to queues
@@ -65,20 +65,6 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     |oem    |status   |
     |bmw    |none     |
     |bmw    |partial  |
-#    |aoa    |none     |
-#    |aoa    |partial  |
-#    |bmw    |none     |
-#    |bmw    |partial  |
-#    |aoa    |none     |
-#    |aoa    |partial  |
-#    |bmw    |none     |
-#    |bmw    |partial  |
-#    |aoa    |none     |
-#    |aoa    |partial  |
-#    |bmw    |none     |
-#    |bmw    |partial  |
-#    |aoa    |none     |
-#    |aoa    |partial  |
 
 
 
@@ -93,7 +79,7 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     And Get a random <oem> vehicle with <status> and Not removed
     And generate a new uuid
     And fill in the payload with the <oem> vin and new uuid
-    And publish the message and wait for three seconds
+    And publish the message and wait for 3 seconds
     Then The new item should exist in the vehicle table and the status should be <status>
     And The next_scheduled_date of the new item should be more than 1000 years
     And close the browser
@@ -114,14 +100,14 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid with force refresh
-    And publish the message and wait for three seconds
+    And publish the message and wait for 3 seconds
     Then The new item should exist in the vehicle table and the status should be <statusExpected>
     And The next_scheduled_date of the new item should be less than 1 hour
     And Go to queues
     And Choose image-action-high-priority queue
     And Wait until the number of messages in the queue is 1
     And Query myVehicle again
-    And The next_scheduled_date of the item should be greater but no more than 1 hours
+    And The next_scheduled_date of the item should be greater than now but no more than 1 hours
     And close the browser
     And set the removed flag to true for myVehicle
 
@@ -145,7 +131,7 @@ Feature: Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid
-    And publish the message and wait for three seconds
+    And publish the message and wait for 3 seconds
     Then The new item should exist in the vehicle table and the status should be <status>
     And Vehicles with old and new uuids and should have have equal number of images mapped
     And close the browser

@@ -17,7 +17,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 public class base {
 
     public WebDriver driver;
-    public Properties prop;
+    public static Properties prop;
     public Queries q;
     public Vehicle v;
     public Vehicle myVehicle;

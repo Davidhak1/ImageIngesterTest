@@ -6,13 +6,15 @@ import org.apache.logging.log4j.Logger;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Queries {
 
-    public static Logger log = LogManager.getLogger(base.class.getName());
+
+    private static Logger log = LogManager.getLogger(base.class.getName());
+
     private MysqlCon mysqlCon= new MysqlCon();
+
     public Vehicle getVehicleByUUID(String uuid) {
         Statement stmt = mysqlCon.getStatement();
 
@@ -36,17 +38,22 @@ public class Queries {
         return null;
     }
 
-    public Vehicle getVehicleByVIN(String vin) {
+    public List<Vehicle> getVehicleByVINAndNotRemoved(String vin) {
         Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
         try {
-            log.debug("Querying vehicle table, finding with 'vin'....");
-            ResultSet rs = stmt.executeQuery("select * from vehicle where vin = '"+vin+"';");
+            log.debug("Querying vehicle table, finding with 'vin' and Not removed....");
+            ResultSet rs = stmt.executeQuery("select * from vehicle where vin = '"+vin+"' AND removed = false;");
 
-            while (rs.next())
-                return new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
-                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
-                        rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime());
 
+            while (rs.next()) {
+                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9),
+                        rs.getTimestamp(10),rs.getTimestamp(11)));
+            }
+
+            if(vehicles.size()>0)
+                return vehicles;
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -54,9 +61,57 @@ public class Queries {
             mysqlCon.endCon();
         }
 
-        log.warn("No vehicle found with 'uuid' - "+vin );
-        System.out.println("No vehicle found with 'uuid' - "+vin);
+        log.warn("No vehicle found with 'vin' - "+vin + " and not removed" );
+        System.out.println("No vehicle found with 'vin' - "+ vin + " and not removed");
         return null;
+    }
+
+    public List<Vehicle> getVehicleBySpecificUuidLength(int length) {
+        Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        try {
+            log.debug("Querying vehicle table, finding with uuid length = "+length+ "...");
+            ResultSet rs = stmt.executeQuery("select * from vehicle where LENGTH(UUID) = "+length+";");
+
+
+            while (rs.next()) {
+                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9),
+                        rs.getTimestamp(10),rs.getTimestamp(11)));
+            }
+
+            if(vehicles.size()>0)
+                return vehicles;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return null;
+    }
+
+    public int getNumberOfImagesForUuid(String uuid){
+        Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        int count=0;
+        try {
+            log.debug("Querying vehicle table, finding number of images for uuid = "+uuid+ "...");
+            ResultSet rs = stmt.executeQuery(String.format("select * from vehicle_image where vehicle_uuid = '%s';", uuid));
+
+            while (rs.next()) {
+                count++;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return count;
+
     }
 
     public List<Vehicle> getVehiclesByStatus(String status){
@@ -88,14 +143,14 @@ public class Queries {
 
     }
 
-    public List<Vehicle> getVehiclesByOem(String oem){
+    private List<Vehicle> getVehiclesByOem(String oem){
         Statement stmt = mysqlCon.getStatement();
 
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
 
         try {
             log.debug("Querying vehicle table, finding with 'oem'....");
-            ResultSet rs = stmt.executeQuery("select * from vehicle where oem = '"+oem+"';");
+            ResultSet rs = stmt.executeQuery(String.format("select * from vehicle where oem = '%s';", oem));
 
             while (rs.next()) {
                 vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
@@ -284,6 +339,93 @@ public class Queries {
 
     }
 
+    public void updateVehicleSetRemovedToTrueWhereLengthIs(int length) {
+
+        Statement stmt = mysqlCon.getStatement();
+        int response=0;
+        try {
+            log.debug("Querying vehicle table, setting removed column to true for uuid.length = 35 ");
+            response = stmt.executeUpdate("update vehicle set removed = true where LENGTH(uuid) = "+length+" AND removed = false;");
+            log.info("The query effected "+ response + "raws");
+
+
+                System.out.println("The Query to set the removed column to true for uuid.length = 35 effect "+response+" rows");
+                log.warn("The Query to set the removed column to true for uuid.length = 35 effect "+response+" rows");
+
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+
+    }
+
+    public void deleteImagesForVehiclesHavingUuidLength(int length) {
+
+        Statement stmt = mysqlCon.getStatement();
+        int response=0;
+        try {
+
+            if (length == 32) {
+                throw new Exception("Not allowed to delete with length 32");
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        try {
+            log.debug(String.format("Deleting image associations for uuid.length = %d", length));
+            response = stmt.executeUpdate(String.format("delete from vehicle_image where LENGTH(vehicle_uuid) = %d;", length));
+            log.info("The query effected "+ response + "rows");
+
+
+            System.out.printf("The Query of deleting image associations for uuid.length = %d effected %d rows%n", length, response);
+            log.info(String.format("The Query of deleting image associations for uuid.length = %d effected %d rows", length, response));
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+    }
+
+    public void deleteVehiclesHavingUuidLength(int length) {
+
+        Statement stmt = mysqlCon.getStatement();
+        int response=0;
+        try {
+
+            if (length == 32) {
+                throw new Exception("Not allowed to delete with length 32");
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        try {
+            log.debug(String.format("Deleting image associations for uuid.length = %d", length));
+            response = stmt.executeUpdate(String.format("delete from vehicle where LENGTH(uuid) = %d;", length));
+            log.info("The query effected "+ response + "rows");
+
+
+            System.out.printf("The Query of deleting vehicles for uuid.length = %d effected %d rows%n", length, response);
+            log.info(String.format("The Query of deleting vehicles for uuid.length = %d effected %d rows", length, response));
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+    }
+
     public int getNumberOfImagesMappedToVehicleByUuid(String uuid){
 
         Statement stmt = mysqlCon.getStatement();
@@ -309,19 +451,6 @@ public class Queries {
     }
 
     public static void main(String[] args) {
-
-        Queries q = new Queries();
-//        Vehicle a = q.getVehicleByVIN("WBAJB9C57KB288436");
-//        System.out.println(a);
-        List<Vehicle> b = q.getVehiclesByOem("bmw");
-
-        int count = 0;
-        for(Vehicle v : b)
-        {
-            System.out.println(v);
-            count++;
-        }
-        System.out.println(count);
 
     }
 

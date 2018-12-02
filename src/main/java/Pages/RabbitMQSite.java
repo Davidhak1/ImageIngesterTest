@@ -63,6 +63,11 @@ import org.openqa.selenium.WebElement;
 
         public WebElement getqueueTab()
         {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             return driver.findElement(queuesTab);
         }
         public WebElement getImageActionQueue()
