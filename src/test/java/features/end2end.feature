@@ -14,7 +14,7 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
   @bmw_end2end
   @end2end_1
-  Scenario Outline: E2E Validating the status and the next_scheduled_time for vehicles that have the same VIN already existing in the db with status initial
+  Scenario Outline: E2E Validating the status and the next_scheduled_time for vehicles that have the same VIN already existing in the db with status initial for bmw
 
     And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid
@@ -30,18 +30,37 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
       |oem    |status |
       |bmw    |initial|
       |bmw    |initial|
-#      |bmw    |initial|
-#      |bmw    |initial|
-#      |aoa    |initial|
-#      |aoa    |initial| For aoa create with constant vin
 
-#Manually we can also check if the message exists in the queue or not
 
+
+#----------------------------------------------------------------------------------------------------------------------------
+  @bmw_end2end
+  @end2end_2
+  Scenario Outline: E2E Validating the status and the next_scheduled_time for vehicles that have the same VIN already existing in the db with status initial for audi
+
+    And Get the vehicle with <vin> vin Not Removed
+    And Extend the vehicle's original uuid
+    And fill in the payload with the <oem> vin and new uuid with force refresh
+    And publish the message and wait for 1 seconds
+    Then The new item should exist in the vehicle table and the status should be <status>
+    And The next_scheduled_date of the new item should be less than 1 hour
+    And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
+    And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
+    And close the browser
+    And set the removed flag to true for myVehicle
+
+    Examples:
+      |oem    |status |vin              |
+      |aoa    |initial|WAU8DAF89KN003220|
+      |aoa    |initial|WA1FVAF17KD014453|
+
+    #WBA4W9C51KAF94395 with complete solution in the Server but partial in the db
+    #WBXYJ3C33JEJ82355 With partial solution in the Server but initial in the db
 #----------------------------------------------------------------------------------------------------------------------------
 
 
   @bmw_end2end
-    @end2end_2
+    @end2end_3
   Scenario Outline: E2E Validating the status and the timestamp for vehicles that have the same VIN already existing in the db with status none and partial
 
     And Get the vehicle with <vin> vin Not Removed
@@ -69,15 +88,10 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
   # WA1BCCFS4JR027669 - This vehicle has None status in the image_ingester table, and no urls in AOA server
   # WAU44AFD2JN000766 - This vehicle has Partial status in the image_ingester table, and no urls in AOA server
 
-
-
-
-
-
   #----------------------------------------------------------------------------------------------------------------------------
 
   @bmw_end2end
-  @end2end_3
+  @end2end_4
   Scenario Outline: E2E Test validating the queue and the timestamp for vehicles that already exist in the db with status complete Not Force
 
     And Get a random <oem> vehicle with <status> and Not removed
@@ -102,7 +116,7 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 #----------------------------------------------------------------------------------------------------------------------------
 
   @bmw_end2end
-  @end2end_4
+  @end2end_5
   Scenario Outline: E2E Test validating the queue and the timestamp for vehicles that already exist in the db with all statuses and Force Refreshed
 
     And Get a random <oem> vehicle with <status> and Not removed
@@ -119,22 +133,16 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     Examples:
       |oem    |status   |
-      |bmw    |initial  |
       |bmw    |none     |
       |bmw    |partial  |
       |bmw    |complete |
-
-#      |bmw    |initial  |
-#      |bmw    |none     |
-#      |bmw    |partial  |
-#      |bmw    |complete |
       |aoa    |none     |
       |aoa    |partial  |
       |aoa    |complete |
 #----------------------------------------------------------------------------------------------------------------------------
 
   @bmw_end2end
-  @end2end_5
+  @end2end_6
   Scenario Outline: E2E Validating if all the images are mapped to new items that have VINs already existing in the db with completed or partial solutions
 
     And Get a random <oem> vehicle with <status> and Not removed
@@ -161,7 +169,7 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 #----------------------------------------------------------------------------------------------------------------------------
 
   @bmw_end2end
-  @end2end_6
+  @end2end_7
     Scenario Outline: E2E (BMW only) validating that with force refresh it calls directly to Sulzer & Cozy and doesn't compare the number of images in the system
 
     And Get the vehicle with <vin> vin Not Removed
@@ -189,7 +197,7 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
 #----------------------------------------------------------------------------------------------------------------------------
   @bmw_end2end
-  @end2end_7
+  @end2end_8
   Scenario Outline: E2E (AOA only) validating that with force refresh it calls directly to AOA Servers and doesn't compare the number of images in the system
 
     And Get the vehicle with <vin> vin Not Removed
@@ -215,7 +223,7 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
       # WAUG3AFC3JN049188 - This vehicle has Complete status in the image_ingester table, but no image in AOA Server,
 
   @bmw_end2end
-  @end2end_8
+  @end2end_9
     Scenario Outline: Verifying that we are getting 10 urls from Sulzar, when we call their API with the right VIN
     Then Verify we are getting 10 urls for the <vin> vin
     And close the browser
@@ -225,4 +233,4 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     |WBA8E5C56JA506627   |
     |WBAJA5C5XKG900336   |
 
-    #Both vins have 10 urls when called Sulzer
+    #Sulzer returns 10 urls for both vins

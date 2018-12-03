@@ -149,10 +149,4 @@ public class Utils {
     }
 
 
-
-//    public static void main(String[] args) {
-//        Utils rs = new Utils();
-//        System.out.println(rs.uuidGenerator());
-//
-//    }
 }

@@ -20,7 +20,6 @@ public class stepDefinitionRestAssured extends base {
     public void verify_we_are_getting_spesicic_urls_for_vin(int number, String vin) throws Throwable {
 
         RestAssured.baseURI = prop.getProperty("SULZER_URI");
-
         given().
                 header("user", "user").
                 header("password", "password").

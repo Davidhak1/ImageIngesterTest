@@ -114,123 +114,6 @@ public class Queries {
 
     }
 
-    public List<Vehicle> getVehiclesByStatus(String status){
-            List<Vehicle> vehicles = new ArrayList<Vehicle>();
-
-        Statement stmt = mysqlCon.getStatement();
-            try {
-                log.debug("Querying vehicle table, finding with status....");
-                ResultSet rs = stmt.executeQuery("select * from vehicle where status = '"+status+"';");
-
-                while (rs.next()) {
-                    vehicles.add( new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
-                            rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
-                            rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime()));
-                }
-                if(vehicles.size()>0) {
-                    return vehicles;
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            finally{
-                mysqlCon.endCon();
-            }
-
-            log.warn("No vehicle found with 'status' - "+ status );
-        System.out.println("No vehicle found with 'status' - "+ status);
-            return null;
-
-    }
-
-    private List<Vehicle> getVehiclesByOem(String oem){
-        Statement stmt = mysqlCon.getStatement();
-
-        List<Vehicle> vehicles = new ArrayList<Vehicle>();
-
-        try {
-            log.debug("Querying vehicle table, finding with 'oem'....");
-            ResultSet rs = stmt.executeQuery(String.format("select * from vehicle where oem = '%s';", oem));
-
-            while (rs.next()) {
-                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
-                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
-                        rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime()));
-
-            }
-            if(vehicles.size()>0) {
-
-                return vehicles;
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        finally{
-            mysqlCon.endCon();
-        }
-
-        log.warn("No vehicle found with 'status' - " + oem );
-        System.out.println("No vehicle found with 'oem' - "+ oem);
-        return null;
-
-    }
-
-    public List<Vehicle> getVehiclesByStatusAndRemoved(String status, boolean removed){
-        List<Vehicle> vehicles = new ArrayList<Vehicle>();
-
-        Statement stmt = mysqlCon.getStatement();
-        try {
-            log.debug("Querying vehicle table, finding with 'status' & 'removed'....");
-            ResultSet rs = stmt.executeQuery("select * from vehicle where status = '"+status+"' AND removed = '"+removed+"';");
-
-            while (rs.next()) {
-                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
-                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
-                        rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime()));
-            }
-
-            return vehicles;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        finally{
-            mysqlCon.endCon();
-        }
-
-        log.warn("No vehicle found with 'status', and 'removed - " + status + ", " + removed );
-        System.out.println("No vehicle found with 'status' and 'removed' - "+ status + "\t" + removed);
-        return null;
-
-    }
-
-    public List<Vehicle> getVehiclesByOemAndStatus(String oem, String status){
-        Statement stmt = mysqlCon.getStatement();
-
-        List<Vehicle> vehicles = new ArrayList<Vehicle>();
-
-        try {
-            log.debug("Querying vehicle table, finding with 'oem' & 'status'....");
-            ResultSet rs = stmt.executeQuery("select * from vehicle where oem = '"+oem+"' AND status = '"+status+ "';");
-
-            while (rs.next()) {
-                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
-                        rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getTimestamp(9).toLocalDateTime(),
-                        rs.getTimestamp(10).toLocalDateTime(), rs.getTimestamp(11).toLocalDateTime()));
-            }
-
-            return vehicles;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        finally{
-            mysqlCon.endCon();
-        }
-        log.warn("No vehicle found with 'oem', and 'status - " + oem + ", " + status );
-        System.out.println("No vehicle found with 'oem' & 'status' - "+ oem + "\t" + status);
-        return null;
-
-    }
-
     public List<Vehicle> getVehiclesByStatusAndRemovedAndOem(String status, boolean removed, String oem){
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
 
@@ -450,9 +333,126 @@ public class Queries {
 
     }
 
-    public static void main(String[] args) {
+    public List<Vehicle> getVehiclesByStatus(String status){
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+
+        Statement stmt = mysqlCon.getStatement();
+        try {
+            log.debug("Querying vehicle table, finding with status....");
+            ResultSet rs = stmt.executeQuery("select * from vehicle where status = '"+status+"';");
+
+            while (rs.next()) {
+                vehicles.add( new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
+                        rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime()));
+            }
+            if(vehicles.size()>0) {
+                return vehicles;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        log.warn("No vehicle found with 'status' - "+ status );
+        System.out.println("No vehicle found with 'status' - "+ status);
+        return null;
 
     }
+
+    private List<Vehicle> getVehiclesByOem(String oem){
+        Statement stmt = mysqlCon.getStatement();
+
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+
+        try {
+            log.debug("Querying vehicle table, finding with 'oem'....");
+            ResultSet rs = stmt.executeQuery(String.format("select * from vehicle where oem = '%s';", oem));
+
+            while (rs.next()) {
+                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
+                        rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime()));
+
+            }
+            if(vehicles.size()>0) {
+
+                return vehicles;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        log.warn("No vehicle found with 'status' - " + oem );
+        System.out.println("No vehicle found with 'oem' - "+ oem);
+        return null;
+
+    }
+
+    public List<Vehicle> getVehiclesByStatusAndRemoved(String status, boolean removed){
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+
+        Statement stmt = mysqlCon.getStatement();
+        try {
+            log.debug("Querying vehicle table, finding with 'status' & 'removed'....");
+            ResultSet rs = stmt.executeQuery("select * from vehicle where status = '"+status+"' AND removed = '"+removed+"';");
+
+            while (rs.next()) {
+                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
+                        rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime()));
+            }
+
+            return vehicles;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        log.warn("No vehicle found with 'status', and 'removed - " + status + ", " + removed );
+        System.out.println("No vehicle found with 'status' and 'removed' - "+ status + "\t" + removed);
+        return null;
+
+    }
+
+    public List<Vehicle> getVehiclesByOemAndStatus(String oem, String status){
+        Statement stmt = mysqlCon.getStatement();
+
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+
+        try {
+            log.debug("Querying vehicle table, finding with 'oem' & 'status'....");
+            ResultSet rs = stmt.executeQuery("select * from vehicle where oem = '"+oem+"' AND status = '"+status+ "';");
+
+            while (rs.next()) {
+                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
+                        rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getTimestamp(9).toLocalDateTime(),
+                        rs.getTimestamp(10).toLocalDateTime(), rs.getTimestamp(11).toLocalDateTime()));
+            }
+
+            return vehicles;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+        log.warn("No vehicle found with 'oem', and 'status - " + oem + ", " + status );
+        System.out.println("No vehicle found with 'oem' & 'status' - "+ oem + "\t" + status);
+        return null;
+
+    }
+
+//    public static void main(String[] args) {
+//
+//    }
 
 
 }

@@ -152,13 +152,4 @@ import org.openqa.selenium.WebElement;
 
         public WebElement getAlertCloseButton(){return driver.findElement(aletCloseButton);}
 
-
-
-
-
-//        public int getPopUpSize()
-//        {
-//            return driver.findElements(popup).size();
-//        }
-
     }
