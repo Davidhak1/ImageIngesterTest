@@ -100,6 +100,7 @@ public class stepDefinition extends base {
         Utils u = new Utils();
         log.debug(String.format("extending audi uuid%s", v.getUuid()));
         uuid = u.audiUuidExtender(v.getUuid(),3);
+        u.UUIDStoreInExcel(uuid);
         log.info(String .format("Successfully extended audi uuid: %s to uuid: %s",v.getUuid(), uuid));
 
     }
