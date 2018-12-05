@@ -25,6 +25,8 @@ public class stepDefinitionRestAssured extends base {
                 header("password", "password").
                 when().
                 get("/"+vin+"?pov=driverdoor,dashboard&angle=45,90,135,180,225,270,315,360&bkgnd=transparent&imgtype=png&height=960&width=1280").
-                then().assertThat().statusCode(200).and().contentType(ContentType.JSON).and().body("imageUrls.size()", is(number));
+                then().assertThat().statusCode(200).and().
+                contentType(ContentType.JSON).and().
+                body("imageUrls.size()", is(number));
     }
 }

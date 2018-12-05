@@ -43,8 +43,7 @@ class MysqlCon{
     }
 
 
-    public void endCon()
-    {
+    public void endCon() {
         try {
             con.close();
         } catch (SQLException e) {

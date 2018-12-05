@@ -90,6 +90,24 @@ public class Utils {
 
     }
 
+    public int getVehicleEligibleForRemovalAndSendToStore(int length) throws IOException {
+        Queries q= new Queries();
+
+
+
+        List<Vehicle> vehicles = q.getVehicleBySpecificUuidLength(length);
+        if (vehicles!=null) {
+            for (Vehicle v : vehicles) {
+                int image_num = q.getNumberOfImagesForUuid(v.getUuid());
+                storeVehiclesInExcelBeforeRemoval(v.getUuid(), v.getStatus(), v.getVin(), v.getOem(), (v.getNext_scheduled_on().toString()), image_num);
+            }
+        }
+        else {
+            return 0;
+        }
+        return 1;
+    }
+
     private void storeVehiclesInExcelBeforeRemoval(String uuid, String status, String vin, String oem,String next_scheduled, int number) throws IOException {
         log.info("inside method");
 
@@ -130,23 +148,6 @@ public class Utils {
         }
     }
 
-    public int getVehicleEligibleForRemovalAndSendToStore(int length) throws IOException {
-        Queries q= new Queries();
-
-
-
-        List<Vehicle> vehicles = q.getVehicleBySpecificUuidLength(length);
-        if (vehicles!=null) {
-            for (Vehicle v : vehicles) {
-                int image_num = q.getNumberOfImagesForUuid(v.getUuid());
-                storeVehiclesInExcelBeforeRemoval(v.getUuid(), v.getStatus(), v.getVin(), v.getOem(), (v.getNext_scheduled_on().toString()), image_num);
-            }
-        }
-        else {
-            return 0;
-        }
-        return 1;
-    }
 
 
 }

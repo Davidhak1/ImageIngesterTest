@@ -309,14 +309,14 @@ public class Queries {
 
     }
 
-    public int getNumberOfImagesMappedToVehicleByUuid(String uuid){
+    public int getNumberOfImagesMappedToVehicleByUuidNotRemoved(String uuid){
 
         Statement stmt = mysqlCon.getStatement();
         int count = 0;
 
         try{
-            log.debug("getting the number of Images mapped to a vehicle by uuid..."+ ", uuid:"+uuid);
-            ResultSet rs = stmt.executeQuery("select * from vehicle_image where vehicle_uuid = '"+uuid+"';");
+            log.debug("getting the number of Images mapped to a vehicle by uuid..."+ ", uuid:"+uuid+ "not removed");
+            ResultSet rs = stmt.executeQuery("select * from vehicle_image where vehicle_uuid = '"+uuid+"' AND removed = false;");
             while(rs.next()){
                 count++;
             }

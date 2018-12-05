@@ -293,11 +293,7 @@ public class stepDefinition extends base {
 	public void the_new_item_should_exist_in_the_vehicle_table_and_the_status_should_be_status(String expectedStatus) throws Throwable {
 
         log.debug("Asserting if the new item exists in the MySQL 'vehicle' table"+", uuid:"+ this.uuid);
-//        try{
-//            Thread.sleep(1000);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
+
         myVehicle = q.getVehicleByUUID(this.uuid);
         Assert.assertTrue(myVehicle!=null, "There is no Vehicle with the uuid "+ this.uuid);
         Assert.assertEquals((myVehicle.getStatus().toLowerCase()),expectedStatus.toLowerCase(), "Status should be "+expectedStatus+", but it's " + myVehicle.getStatus()+", uuid:"+ this.uuid );
@@ -330,8 +326,6 @@ public class stepDefinition extends base {
 	public void wait_until_the_number_of_messages_in_the_queue_changes() throws Throwable {
 
         int initialMessageCount = rmq.getReadyMessageCountInt();
-
-//           Assert.assertEquals(initialMessageCount,0,"There are more than 0 messages in the queue ( which was purged)");
 
         int count = 0;
         int messageCount=initialMessageCount;
@@ -469,15 +463,15 @@ public class stepDefinition extends base {
     @Then("^Vehicles with old and new uuids and should have have equal number of images mapped$")
     public void vehicles_with_old_and_new_uuids_and_should_have_equal_number_of_images_mapped() throws Throwable {
         log.debug("Comparing the amount of images of vehicles:"+v.getUuid() + " and " + this.uuid);
-        int amount1 = q.getNumberOfImagesMappedToVehicleByUuid(v.getUuid());
-        int amount2 = q.getNumberOfImagesMappedToVehicleByUuid(this.uuid);
+        int amount1 = q.getNumberOfImagesMappedToVehicleByUuidNotRemoved(v.getUuid());
+        int amount2 = q.getNumberOfImagesMappedToVehicleByUuidNotRemoved(this.uuid);
 
         Assert.assertEquals(amount1,amount2, "The amount of images of these two vehicles are not equal, " +
-                "uuids - amounts"+ v.getUuid() + " - " +amount1 + ":" + this.uuid + " - " + amount2);
+                "uuids - "+ v.getUuid() + " - " +amount1 + " : " + this.uuid + " - " + amount2);
 
         if(amount1!=amount2)
             log.error("The amount of images of these two vehicles are not equal, " +
-                    "uuids - amounts"+ v.getUuid() + " - " +amount1 + ":" + this.uuid + " - " + amount2);
+                    "uuids - "+ v.getUuid() + " - " +amount1 + " : " + this.uuid + " - " + amount2);
 
 
 
@@ -579,7 +573,7 @@ public class stepDefinition extends base {
         int tableImages;
         int SulzerURLs;
 
-        tableImages = q.getNumberOfImagesMappedToVehicleByUuid(uuid);
+        tableImages = q.getNumberOfImagesMappedToVehicleByUuidNotRemoved(uuid);
 
 
     }

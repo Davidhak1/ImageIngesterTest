@@ -18,7 +18,7 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid
-    And publish the message and wait for 2 seconds
+    And publish the message and wait for 1 seconds
     Then The new item should exist in the vehicle table and the status should be <status>
     And The next_scheduled_date of the new item should be less than 1 hour
     And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
@@ -161,6 +161,10 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
       |bmw    |complete |
       |aoa    |partial  |
       |aoa    |complete |
+      |bmw    |partial  |
+      |bmw    |complete |
+      |aoa    |partial  |
+      |aoa    |complete |
 
 #      |bmw    |partial  |
 #      |bmw    |complete |
@@ -232,5 +236,6 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     |vin                 |
     |WBA8E5C56JA506627   |
     |WBAJA5C5XKG900336   |
+
 
     #Sulzer returns 10 urls for both vins
