@@ -18,9 +18,8 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid
-    And publish the message and wait for 1 seconds
-    Then The new item should exist in the vehicle table and the status should be <status>
-    And The next_scheduled_date of the new item should be less than 1 hour
+    And publish the message and wait for 2 seconds
+    Then The new item should exist in the vehicle table
     And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
     And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
     And close the browser
@@ -28,6 +27,12 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     Examples:
       |oem    |status |
+      |bmw    |initial|
+      |bmw    |initial|
+      |bmw    |initial|
+      |bmw    |initial|
+      |bmw    |initial|
+      |bmw    |initial|
       |bmw    |initial|
       |bmw    |initial|
 
@@ -41,9 +46,8 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     And Get the vehicle with <vin> vin Not Removed
     And Extend the vehicle's original uuid
     And fill in the payload with the <oem> vin and new uuid with force refresh
-    And publish the message and wait for 1 seconds
-    Then The new item should exist in the vehicle table and the status should be <status>
-    And The next_scheduled_date of the new item should be less than 1 hour
+    And publish the message and wait for 2 seconds
+    Then The new item should exist in the vehicle table
     And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
     And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
     And close the browser
@@ -95,11 +99,10 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
   Scenario Outline: E2E Test validating the queue and the timestamp for vehicles that already exist in the db with status complete Not Force
 
     And Get a random <oem> vehicle with <status> and Not removed
-    And generate a new uuid
     And fill in the payload with the <oem> vin and new uuid
-    And publish the message and wait for 2 seconds
+    And publish the message and wait for 5 seconds
     Then The new item should exist in the vehicle table and the status should be <status>
-    And The next_scheduled_date of the new item should be more than 7000 years
+    And The next_scheduled_date of the new item should be the same as for the original one
     And close the browser
     And set the removed flag to true for myVehicle
 
@@ -109,9 +112,12 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
       |oem |status     |
       |bmw |complete   |
       |aoa |complete   |
-
-#      |bmw |complete   |
-#      |aoa |complete   |
+      |bmw |complete   |
+      |aoa |complete   |
+      |bmw |complete   |
+      |aoa |complete   |
+      |bmw |complete   |
+      |aoa |complete   |
 
 #----------------------------------------------------------------------------------------------------------------------------
 
@@ -122,8 +128,7 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid with force refresh
     And publish the message and wait for 2 seconds
-    Then The new item should exist in the vehicle table and the status should be initial
-    And The next_scheduled_date of the new item should be less than 1 hour
+    Then The new item should exist in the vehicle table
     And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
     And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
     And close the browser
@@ -147,7 +152,7 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid
-    And publish the message and wait for 0 seconds
+    And publish the message and wait for 2 seconds
     Then The new item should exist in the vehicle table and the status should be <status>
     And Vehicles with old and new uuids and should have have equal number of images mapped
     And close the browser
@@ -166,10 +171,10 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
       |aoa    |partial  |
       |aoa    |complete |
 
-#      |bmw    |partial  |
-#      |bmw    |complete |
-#      |aoa    |partial  |
-#      |aoa    |complete |
+      |bmw    |partial  |
+      |bmw    |complete |
+      |aoa    |partial  |
+      |aoa    |complete |
 #----------------------------------------------------------------------------------------------------------------------------
 
   @bmw_end2end
@@ -178,11 +183,12 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     And Get the vehicle with <vin> vin Not Removed
     And fill in the payload with the <oem> vin and new uuid with force refresh
-    And publish the message and wait for 0 seconds
+    And publish the message and wait for 2 seconds
     And The new item should exist in the vehicle table and the status should be initial
     Then The status of the old vehicle should be <status>
     And The next_scheduled_date of the new item should be less than 1 hour
     And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
+    And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
     Then The new item should exist in the vehicle table and the status should be <expectedStatus>
     And close the browser
     And set the removed flag to true for myVehicle
@@ -193,8 +199,8 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
       |oem    |status   |vin              |expectedStatus|
       |bmw    |partial  |WBXHT3C36J5L27981|None          |
       |bmw    |complete |5UXTR9C57JLD68868|None          |
-#      |bmw    |partial  |WBXHT3C36J5L27981|None          |
-#      |bmw    |complete |5UXTR9C57JLD68868|None          |
+      |bmw    |partial  |WBXHT3C36J5L27981|None          |
+      |bmw    |complete |5UXTR9C57JLD68868|None          |
 
   # WBXHT3C36J5L27981 - This vehicle has Partial status in the image_ingester table, but no image urls in sulzer,
   # 5UXTR9C57JLD68868 - This vehicle has Complete status in the image_ingester table, but no image urls in sulzer,
@@ -209,9 +215,8 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     And fill in the payload with the <oem> vin and new uuid with force refresh
     And publish the message and wait for 1 seconds
     And The new item should exist in the vehicle table and the status should be initial
-    Then The status of the old vehicle should be <status>
-    And The next_scheduled_date of the new item should be less than 1 hour
     And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
+    And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
     Then The new item should exist in the vehicle table and the status should be none
     And close the browser
     And set the removed flag to true for myVehicle
@@ -220,22 +225,22 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
       |oem    |status   |vin                |
       |aoa    |partial  |WA1LFAFP8FA011332  |
       |aoa    |complete |WAUG3AFC3JN049188  |
-#      |aoa    |partial  |WA1LFAFP8FA011332  |
-#      |aoa    |complete |WAUG3AFC3JN049188  |
+      |aoa    |partial  |WA1LFAFP8FA011332  |
+      |aoa    |complete |WAUG3AFC3JN049188  |
 
       # WA1LFAFP8FA011332 - This vehicle has Partial status in the image_ingester table, but no image in AOA Server,
       # WAUG3AFC3JN049188 - This vehicle has Complete status in the image_ingester table, but no image in AOA Server,
 
-  @bmw_end2end
-  @end2end_9
-    Scenario Outline: Verifying that we are getting 10 urls from Sulzar, when we call their API with the right VIN
-    Then Verify we are getting 10 urls for the <vin> vin
-    And close the browser
-
-    Examples:
-    |vin                 |
-    |WBA8E5C56JA506627   |
-    |WBAJA5C5XKG900336   |
+#  @bmw_end2end
+#  @end2end_9
+#    Scenario Outline: Verifying that we are getting 10 urls from Sulzar, when we call their API with the right VIN
+#    Then Verify we are getting 10 urls for the <vin> vin
+#    And close the browser
+#
+#    Examples:
+#    |vin                 |
+#    |WBA8B9C54JEE82565   |
+#    |WBA4J5C57KBM65950   |
 
 
     #Sulzer returns 10 urls for both vins

@@ -2,6 +2,7 @@ package stepDefinations;
 
 
 import Pages.RabbitMQSite;
+import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -14,11 +15,12 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
+
 import resources.Utils;
 import resources.Vehicle;
 import resources.base;
 
+import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Random;
 import java.time.*;
@@ -34,6 +36,14 @@ public class stepDefinition extends base {
     private static String uuid = null;
     private static int testCount = 0;
 
+    @Before
+    public void before() {
+        long threadId = Thread.currentThread().getId();
+        String processName = ManagementFactory.getRuntimeMXBean().getName();
+//        System.out.println("Started in thread: " + threadId + ", in JVM: " + processName);
+//        System.out.println("---------------------------_______-----------__bEfOrE-----------------__________--------");
+
+    }
 
     @Given("^Initialize the browser with chrome$")
     public void init_the_browser() throws Throwable {
@@ -67,6 +77,48 @@ public class stepDefinition extends base {
         }
     }
 
+    @Given("^Set the next_scheduled timestamp to NULL for those who are not NULL$")
+    public void set_the_nextscheduled_timestamp_to_null_for_those_who_are_not_null() throws Throwable {
+
+        int response = q.updateVehicleSetNextSchedulesToNull();
+        if(response<1)
+            log.warn("No rows have been effected for the query to set null the next_schedule_on timestamp");
+
+    }
+
+    @Given("^Purge high and low priority queues$")
+    public void purge_high_and_low_priority_queues() throws Throwable {
+        log.debug("Purging high and low priority queues");
+
+        log.debug("Going to low-priority queue");
+        rmq.getImageActionLowQueue().click();
+
+        if(myVehicle==null)
+            log.debug("Clicking on deletePurgeLink");
+        rmq.getDeletePurgeLink().click();
+        log.debug("Clicking on purge button");
+        rmq.getPurgeQueue().click();
+        log.debug("Navigating to Queues");
+        rmq.getqueueTab().click();
+
+        log.debug("Going to high-priority queue");
+        rmq.getImageActionHighQueue().click();
+
+        //2nd time we don't need to click on the hyperlink to purge the queue
+        log.debug("Clicking on purge button");
+        rmq.getPurgeQueue().click();
+        log.debug("Navigating to Queues");
+        rmq.getqueueTab().click();
+
+
+
+        log.info("Successfully purged high and low priority queues");
+        //        WebElement purge = rmq.getPurgeQueue();
+//        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", purge);
+        //        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", purge);
+
+    }
+
     @When("^Get a random (.+) vehicle with (.+) and Not removed$")
     public void get_a_random_bmw_vehicle_with_initial_and_removed(String oem, String status) throws Throwable {
 
@@ -75,9 +127,16 @@ public class stepDefinition extends base {
 
         System.out.println(vehicles.size()+" records found in the db matching the search 'oem'="+ oem+ ", 'status'=" + status);
         log.info(vehicles.size()+" records found in the db matching the search 'oem'="+ oem+ ", 'status'=" + status);
+        Vehicle random =null;
+        boolean repeat = true;
 
-        Vehicle random = vehicles.get(new Random().nextInt(vehicles.size()));
-        System.out.println(random);
+        while(repeat) {
+            random = vehicles.get(new Random().nextInt(vehicles.size()));
+            repeat = q.getNumberOfVehiclesByVin(random.getVin()) > 1;   //returns true if there are more than 1 vehicle with the same vin
+            System.out.println("____________-------------_____________---------_________---------______-------_____----_____-----__---_-__--_--_-__---__-_");
+
+        }
+        System.out.println("Random vehicle chosen: "+ random);
         log.info("The uuid and vin of randomly chosen vehicle: "+random.getUuid() + ", " + random.getVin());
 
         v = new Vehicle(random);
@@ -124,48 +183,6 @@ public class stepDefinition extends base {
         log.debug("Navigating to 'Queues' Tab....");
         rmq.getqueueTab().click();
 	}
-
-	@Given("^Set the next_scheduled timestamp to NULL for those who are not NULL$")
-    public void set_the_nextscheduled_timestamp_to_null_for_those_who_are_not_null() throws Throwable {
-
-       int response = q.updateVehicleSetNextSchedulesToNull();
-       if(response<1)
-           log.warn("No rows have been effected for the query to set null the next_schedule_on timestamp");
-
-    }
-
-    @Given("^Purge high and low priority queues$")
-    public void purge_high_and_low_priority_queues() throws Throwable {
-        log.debug("Purging high and low priority queues");
-
-        log.debug("Going to low-priority queue");
-        rmq.getImageActionLowQueue().click();
-
-        if(myVehicle==null)
-        log.debug("Clicking on deletePurgeLink");
-        rmq.getDeletePurgeLink().click();
-        log.debug("Clicking on purge button");
-        rmq.getPurgeQueue().click();
-        log.debug("Navigating to Queues");
-        rmq.getqueueTab().click();
-
-        log.debug("Going to high-priority queue");
-        rmq.getImageActionHighQueue().click();
-
-        //2nd time we don't need to click on the hyperlink to purge the queue
-        log.debug("Clicking on purge button");
-        rmq.getPurgeQueue().click();
-        log.debug("Navigating to Queues");
-        rmq.getqueueTab().click();
-
-
-
-        log.info("Successfully purged high and low priority queues");
-        //        WebElement purge = rmq.getPurgeQueue();
-//        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", purge);
-        //        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", purge);
-
-    }
 
 	@When("^Choose image-action-queue$")
 	public void choose_image_action_queue() throws Throwable {
@@ -287,6 +304,14 @@ public class stepDefinition extends base {
         log.debug("publishing the message to the queue..."+", uuid:"+ this.uuid);
         rmq.getPublish().click();
         Thread.sleep(sec*1000);
+    }
+
+    @Then("^The new item should exist in the vehicle table$")
+    public void the_new_item_should_exist_in_the_vehicle_table() throws Throwable {
+        log.debug("Asserting if the new item exists in the MySQL 'vehicle' table"+", uuid:"+ this.uuid);
+
+        myVehicle = q.getVehicleByUUID(this.uuid);
+        Assert.assertTrue(myVehicle!=null, "There is no Vehicle with the uuid "+ this.uuid);
     }
 
 	@Then("^The new item should exist in the vehicle table and the status should be (.+)$")
@@ -426,16 +451,13 @@ public class stepDefinition extends base {
         myVehicle =  q.getVehicleByUUID(uuid);
     }
 
-    @Then ("^The next_scheduled_date of the new item should be more than (\\d+) years$")
-    public void the_next_scheduled_date_of_the_new_vehicle_should_be_more_than_x_years(int years){
-        
+    @Then ("^The next_scheduled_date of the new item should be the same as for the original one$")
+    public void comparing_next_scheduled_times(){
 
-        LocalDateTime currDate = LocalDateTime.now();
-        LocalDateTime upperBoundDate = currDate.plusYears(years);
-
-        log.debug("Asserting that the next scheduled timestamp is more than " + years + " years late"+", uuid:"+ this.uuid);
-        Assert.assertTrue(myVehicle.getNext_scheduled_on().isAfter(upperBoundDate),
-                "the next_scheduled timestamp is not more than "+ years +" years"+", uuid:"+ this.uuid);
+        log.debug("Asserting that the next_scheduled_on fields for original and new items are not equal");
+        Assert.assertTrue(myVehicle.getNext_scheduled_on()==v.getNext_scheduled_on(),
+                "the next_scheduled_on fields for original and new items are not equal - " + myVehicle.getNext_scheduled_on() +
+                " : " + v.getNext_scheduled_on());
 
     }
 
@@ -449,7 +471,7 @@ public class stepDefinition extends base {
         log.debug("Asserting if the new item's timestamp is within now and an hour"+", uuid:"+ this.uuid);
 
         Assert.assertTrue((myVehicle.getNext_scheduled_on().isAfter(currDate) && myVehicle.getNext_scheduled_on().isBefore(upperBoundDate)),
-                "the next_scheduled timestamp is more than "+ hours +" hours later, or less than current time"+", uuid:"+ this.uuid);
+                "the next_scheduled timestamp is more than "+ hours +" hours later, or less than current time "+", uuid:  "+ this.uuid);
     }
 
     @Then("^close the browser$")
@@ -526,16 +548,15 @@ public class stepDefinition extends base {
         boolean flag = false;
         int count = 0;
 
-        while(flag==false && count++<40)
+        while(!flag && count++<40)
         {
             Thread.sleep(2000);
             if(count<10) {
                 System.out.println(count + " -- " + myDate);
             }else{
                 System.out.println(count + " - " + myDate);
-
             }
-            log.debug("Waiting until the new item's timestamp is between "+day1+" - "+day2 + " days"+", uuid:"+ this.uuid);
+            log.debug(String.format("Waiting until the new item's timestamp is between %d - %d days, or greatert %d years --  uuid:%s", day1, day2, year, this.uuid));
             myVehicle = q.getVehicleByUUID(this.uuid);
             myDate =  myVehicle.getNext_scheduled_on();
             flag = ((myDate.isAfter(currDate.plusDays(day1)) && myDate.isBefore(currDate.plusDays(day2)) ||
@@ -544,6 +565,47 @@ public class stepDefinition extends base {
         }
         System.out.println(++count + " - " + myDate);
 
+
+    }
+
+    @Then("^Query myVehicle until the date_time is between (\\d+)-(\\d+) days or equals to the original's next_scheduled date$")
+    public void query_myvehicle_until_the_datetime_is_between_68_days_or_equals_to_the_originals_nextscheduled_date(int day1, int day2) throws Throwable {
+        LocalDateTime myDate = myVehicle.getNext_scheduled_on();
+        LocalDateTime currDate = LocalDateTime.now();
+        LocalDateTime originalDate = v.getNext_scheduled_on();
+        boolean flag = false;
+        int count = 0;
+
+        while(!flag && count++<40)
+        {
+            Thread.sleep(2000);
+            if(count<10) {
+                System.out.println(count + " -- " + myDate);
+            }else{
+                System.out.println(count + " - " + myDate);
+
+            }
+            log.debug("Waiting until the new item's timestamp is between "+day1+" - "+day2 + " days or equals to the original's"+", uuid:"+ this.uuid);
+            myVehicle = q.getVehicleByUUID(this.uuid);
+            myDate =  myVehicle.getNext_scheduled_on();
+            flag = ((myDate.isAfter(currDate.plusDays(day1)) && myDate.isBefore(currDate.plusDays(day2)) ||
+                    myDate==originalDate));
+
+        }
+        System.out.println(++count + " - " + myDate);
+    }
+
+    @Then("^The next_scheduled_date of the new item should be between (\\d+)-(\\d+) days or equals to the original's next_scheduled date$")
+    public void the_nextscheduleddate_of_the_new_item_should_be_between_68_days_or_equals_to_the_originals_nextscheduled_date(int day1, int day2) throws Throwable {
+        LocalDateTime myDate = myVehicle.getNext_scheduled_on();
+        LocalDateTime currDate = LocalDateTime.now();
+        LocalDateTime originalDate = v.getNext_scheduled_on();
+        log.debug("Asserting if the new item's timestamp is in between "+day1+" - "+day2 + " days or equals to the original's --- uuid:"+ this.uuid);
+
+        Assert.assertTrue(((myDate.isAfter(currDate.plusDays(day1)) && myDate.isBefore(currDate.plusDays(day2))||
+                        myDate == originalDate)),
+                String.format("the next_scheduled_date of our vehicle is not within %d - %d days. or not equal to original's date --- uuid:%s\n" +
+                        " but it is on %s. Original's date = %s", day1, day2, this.uuid, myVehicle.getNext_scheduled_on(), v.getNext_scheduled_on()));
 
     }
 

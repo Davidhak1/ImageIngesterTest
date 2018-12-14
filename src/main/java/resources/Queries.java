@@ -22,10 +22,14 @@ public class Queries {
             log.debug("Querying vehicle table, finding with 'uuid'....");
             ResultSet rs = stmt.executeQuery("select * from vehicle where uuid = '"+uuid+"';");
 
-            while (rs.next())
+            while (rs.next()) {
                 return new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
-                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
-                        rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime());
+                        rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8),
+                        (rs.getTimestamp(9) != null) ? rs.getTimestamp(9).toLocalDateTime() : null,
+                        (rs.getTimestamp(10) != null) ? rs.getTimestamp(10).toLocalDateTime() : null,
+                        (rs.getTimestamp(11) != null) ? rs.getTimestamp(11).toLocalDateTime() : null);
+
+            }
 
         }catch (Exception e){
             e.printStackTrace();
@@ -64,6 +68,28 @@ public class Queries {
         log.warn("No vehicle found with 'vin' - "+vin + " and not removed" );
         System.out.println("No vehicle found with 'vin' - "+ vin + " and not removed");
         return null;
+    }
+
+    public int getNumberOfVehiclesByVin(String vin){
+        Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        int count=0;
+        try {
+            log.debug("Querying vehicle table, finding number of vehicles for vin = " + vin + "...");
+            ResultSet rs = stmt.executeQuery(String.format("select * from vehicle where vin = '%s';", vin));
+
+            while (rs.next()) {
+                count++;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return count;
+
     }
 
     public List<Vehicle> getVehicleBySpecificUuidLength(int length) {
@@ -316,7 +342,7 @@ public class Queries {
 
         try{
             log.debug("getting the number of Images mapped to a vehicle by uuid..."+ ", uuid:"+uuid+ "not removed");
-            ResultSet rs = stmt.executeQuery("select * from vehicle_image where vehicle_uuid = '"+uuid+"' AND removed = false;");
+            ResultSet rs = stmt.executeQuery("select * from vehicle_image where vehicle_uuid = '"+uuid+"' AND is_removed = false;");
             while(rs.next()){
                 count++;
             }

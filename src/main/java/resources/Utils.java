@@ -99,7 +99,12 @@ public class Utils {
         if (vehicles!=null) {
             for (Vehicle v : vehicles) {
                 int image_num = q.getNumberOfImagesForUuid(v.getUuid());
-                storeVehiclesInExcelBeforeRemoval(v.getUuid(), v.getStatus(), v.getVin(), v.getOem(), (v.getNext_scheduled_on().toString()), image_num);
+                if(v.getNext_scheduled_on()==null)
+                {
+                    v.setNext_scheduled_on(LocalDateTime.of(1,1,1,1,1,1));
+                }
+                else
+                    storeVehiclesInExcelBeforeRemoval(v.getUuid(), v.getStatus(), v.getVin(), v.getOem(), (v.getNext_scheduled_on().toString()), image_num);
             }
         }
         else {
