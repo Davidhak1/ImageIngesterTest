@@ -20,8 +20,8 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     And fill in the payload with the <oem> vin and new uuid
     And publish the message and wait for 2 seconds
     Then The new item should exist in the vehicle table
-    And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
-    And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
+    And Query myVehicle until the status is None, Partial or Complete
+    And The next_scheduled_date of the new item should be between 6-8 days or equal to last_modified_on timestamp
     And close the browser
     And set the removed flag to true for myVehicle
 
@@ -48,8 +48,8 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     And fill in the payload with the <oem> vin and new uuid with force refresh
     And publish the message and wait for 2 seconds
     Then The new item should exist in the vehicle table
-    And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
-    And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
+    And Query myVehicle until the date_time is between 6-8 days or equal to last_modified_on timestamp
+    And The next_scheduled_date of the new item should be between 6-8 days or equal to last_modified_on timestamp
     And close the browser
     And set the removed flag to true for myVehicle
 
@@ -100,9 +100,9 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
 
     And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid
-    And publish the message and wait for 5 seconds
+    And publish the message and wait for 2 seconds
     Then The new item should exist in the vehicle table and the status should be <status>
-    And The next_scheduled_date of the new item should be the same as for the original one
+    And The next_scheduled_date of the new item should be the same as last_updated date and less than 5 mins
     And close the browser
     And set the removed flag to true for myVehicle
 
@@ -129,8 +129,8 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     And fill in the payload with the <oem> vin and new uuid with force refresh
     And publish the message and wait for 2 seconds
     Then The new item should exist in the vehicle table
-    And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
-    And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
+    And Query myVehicle until the date_time is between 6-8 days or equal to last_modified_on timestamp
+    And The next_scheduled_date of the new item should be between 6-8 days or equal to last_modified_on timestamp
     And close the browser
     And set the removed flag to true for myVehicle
 
@@ -187,9 +187,9 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     And The new item should exist in the vehicle table and the status should be initial
     Then The status of the old vehicle should be <status>
     And The next_scheduled_date of the new item should be less than 1 hour
-    And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
-    And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
-    Then The new item should exist in the vehicle table and the status should be <expectedStatus>
+    And Query myVehicle until the status is None, Partial or Complete
+    And The next_scheduled_date of the new item should be between 6-8 days or equal to last_modified_on timestamp
+    And The new item should exist in the vehicle table and the status should be <expectedStatus>
     And close the browser
     And set the removed flag to true for myVehicle
 
@@ -215,8 +215,7 @@ Feature: E2E Testing image ingester for bmw & aoa including rabbitMQ and MySQL
     And fill in the payload with the <oem> vin and new uuid with force refresh
     And publish the message and wait for 1 seconds
     And The new item should exist in the vehicle table and the status should be initial
-    And Query myVehicle until the date_time is between 6-8 days or more then 7000 years from now
-    And The next_scheduled_date of the new item should be between 6-8 days or more then 7000 years from now
+    And Query myVehicle until the status is None, Partial or Complete
     Then The new item should exist in the vehicle table and the status should be none
     And close the browser
     And set the removed flag to true for myVehicle

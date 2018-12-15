@@ -29,4 +29,6 @@ public class stepDefinitionRestAssured extends base {
                 contentType(ContentType.JSON).and().
                 body("imageUrls.size()", is(number));
     }
+
+
 }
