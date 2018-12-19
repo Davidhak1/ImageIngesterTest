@@ -1,15 +1,11 @@
 package resources;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -24,12 +20,9 @@ public class base {
     public String uuid;
 
     public WebDriver initializeDriver() throws IOException {
-
         q = new Queries();
-        prop = new Properties();
-        FileInputStream fis = new FileInputStream("src/main/java/resources/data.properties");
+        initProp();
 
-        prop.load(fis);
         String browserName = prop.getProperty("browser");
         System.out.println(browserName);
 
@@ -49,6 +42,18 @@ public class base {
         return driver;
 
     }
+
+    public static void initProp() {
+        prop = new Properties();
+
+        try {
+            FileInputStream fis = new FileInputStream("src/main/java/resources/data.properties");
+            prop.load(fis);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

@@ -8,6 +8,9 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -23,6 +26,9 @@ import resources.base;
 import java.util.List;
 import java.util.Random;
 import java.time.*;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.core.Is.is;
 
 
 public class stepDefinition extends base {
@@ -701,5 +707,6 @@ public class stepDefinition extends base {
         JavascriptExecutor js = (JavascriptExecutor)driver;
         js.executeScript("arguments[0].scrollIntoView();", element);
     }
+
 
 }

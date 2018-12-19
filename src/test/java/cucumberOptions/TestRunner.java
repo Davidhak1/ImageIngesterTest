@@ -15,8 +15,9 @@ import com.cucumber.listener.Reporter;
 @CucumberOptions(
 		features = "src/test/java/features",
 		glue="stepDefinations",
-		tags = {"@bmw_end2end"},
-//		tags = {"@end2end_7,@end2end_8"},
+//		tags = {"@bmw_end2end"},
+//		tags = {"@end2end_1, @end2end_2, @end2end_3"},
+		tags = {"@bmw_end2end, @Rest_Assured"},
 //		plugin={"pretty","html:target/cucumber-html-report",}
 		plugin={"com.cucumber.listener.ExtentCucumberFormatter:target/html/report.html"},
 		monochrome = true
@@ -24,7 +25,7 @@ import com.cucumber.listener.Reporter;
 public class TestRunner extends AbstractTestNGCucumberTests  {
 	@AfterClass
 	public static void setup() {
-		Reporter.loadXMLConfig(new File("src/test/resources/extent-config.xml"));
+		Reporter.loadXMLConfig(new File("src/main/java/resources/extent-config.xml"));
 		//Reporter.setSystemInfo("Test User", System.getProperty("user.name"));
 		Reporter.setSystemInfo("Test User", "Davit");
 		Reporter.setSystemInfo("Operating System Type", System.getProperty("os.name").toString());

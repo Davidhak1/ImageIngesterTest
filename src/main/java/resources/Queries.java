@@ -92,6 +92,50 @@ public class Queries {
 
     }
 
+    public int getNumberOfVehiclesByAccountIdNotRemoved(String accountId){
+        Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        int count=0;
+        try {
+            log.debug("Querying vehicle table, finding number of vehicles for account_id = " + accountId + "...");
+            ResultSet rs = stmt.executeQuery(String.format("select * from vehicle where account_id = '%s' AND removed = false;", accountId));
+
+            while (rs.next()) {
+                count++;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return count;
+
+    }
+
+    public int getNumberOfAccountsByOem(String oem){
+        Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        int count=0;
+        try {
+            log.debug("Querying vehicle table, finding number of vehicles for oem = " + oem + "...");
+            ResultSet rs = stmt.executeQuery(String.format("select distinct(account_id) from vehicle where oem = '%s'", oem));
+
+            while (rs.next()) {
+                count++;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return count;
+
+    }
+
     public List<Vehicle> getVehicleBySpecificUuidLength(int length) {
         Statement stmt = mysqlCon.getStatement();
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
@@ -99,6 +143,30 @@ public class Queries {
             log.debug("Querying vehicle table, finding with uuid length = "+length+ "...");
             ResultSet rs = stmt.executeQuery("select * from vehicle where LENGTH(UUID) = "+length+";");
 
+
+            while (rs.next()) {
+                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9),
+                        rs.getTimestamp(10),rs.getTimestamp(11)));
+            }
+
+            if(vehicles.size()>0)
+                return vehicles;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return null;
+    }
+    public List<Vehicle> getVehiclesByRemoved(boolean removed) {
+        Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        try {
+            log.debug("Querying vehicle table, finding with removed ="+removed+ "...");
+            ResultSet rs = stmt.executeQuery("select * from vehicle where removed = "+removed+";");
 
             while (rs.next()) {
                 vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
@@ -235,6 +303,32 @@ public class Queries {
             {
                 System.out.println("The Query to set the removed column to true for uuid: +"+ uuid +" didn't effect any rows");
                 log.error("The Query to set the removed column to true for uuid: +"+ uuid +" didn't effect any rows");
+            }
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+            return response;
+        }
+
+    }
+
+    public int updateVehicleSetRemovedToFalse(String uuid) {
+
+        Statement stmt = mysqlCon.getStatement();
+        int response=0;
+        try {
+            log.debug("Querying vehicle table, setting removed column to true for uuid: "+ uuid);
+            response = stmt.executeUpdate("update vehicle set removed = false where uuid ='"+uuid+"';");
+            log.info("The query effected "+ response + "raws");
+
+            if(response <1)
+            {
+                System.out.println("The Query to set the removed column to false for uuid: +"+ uuid +" didn't effect any rows");
+                log.error("The Query to set the removed column to false for uuid: +"+ uuid +" didn't effect any rows");
             }
 
 
