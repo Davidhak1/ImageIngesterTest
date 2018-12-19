@@ -16,7 +16,7 @@ import com.cucumber.listener.Reporter;
 		features = "src/test/java/features",
 		glue="stepDefinations",
 //		tags = {"@bmw_end2end"},
-		tags = {"@end2end_1"},
+//		tags = {"@end2end_1"},
 //		tags = {"@bmw_end2end, @Rest_Assured"},
 //		plugin={"pretty","html:target/cucumber-html-report",}
 		plugin={"com.cucumber.listener.ExtentCucumberFormatter:target/html/report.html"},
