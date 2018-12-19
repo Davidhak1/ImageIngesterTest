@@ -54,6 +54,8 @@ public class RestStepDef {
         initProp();
         request = RestAssured.with();
         System.out.println("\nINIT RESPONSE\n");
+
+
     }
 
     @Given("^the server endpoint is (.+)$")
@@ -181,7 +183,6 @@ public class RestStepDef {
         }
     }
 
-
     @And("^vehicle table should have equal number of vehicles for account in the (.+) as the server returns the filtered (.+) node$")
     public void vehicleTableShouldHaveEqualNumberOfVehiclesForAccountInThePathAsTheServerReturns(String path, String filter) throws Throwable {
         String accountId = StringUtils.substringBefore(path,"/");
@@ -192,7 +193,6 @@ public class RestStepDef {
         System.out.println(String.format("%nAccount: %s, DB: %d, API: %d",accountId, dbLen, serviceLen));
         Assert.assertEquals(dbLen, serviceLen ,  String.format("The length of array in the response and DB items do not match. response len: %d, DB len: %d",serviceLen, dbLen));
     }
-
 
     @Then("^vehicle table should have equal number of accounts in the db as in the response at the filtered (.+) node for (.+)$")
     public void vehicleTableShouldHaveEqualNumberOfAccountsInTheDbAsInTheResponseAtTheFiltered$Node(String filter, String oem) throws Throwable {

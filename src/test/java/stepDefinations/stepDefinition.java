@@ -1,16 +1,13 @@
 package stepDefinations;
 
 
-import Pages.RabbitMQSite;
+import pages.RabbitMQSite;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -20,7 +17,7 @@ import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 
 import resources.Utils;
-import resources.Vehicle;
+import model.Vehicle;
 import resources.base;
 
 import java.util.List;

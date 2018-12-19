@@ -4,25 +4,37 @@ import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import model.DownloadedImage;
 import org.testng.Assert;
 import resources.Queries;
-import resources.Vehicle;
+import model.Vehicle;
+import resources.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class mixStepDef {
 
-    private Queries q;
+    private static Queries q;
     private static List <Vehicle> vehiclesList;
-    private static List<String> uuidList;
+    private static List <DownloadedImage> dwnImages;
 
+    public static List<String> getUuidsList() {
+        List<String> uuidList = new ArrayList<String>();
+
+        for (Vehicle v : vehiclesList) {
+            uuidList.add(v.getUuid());
+        }
+
+        return uuidList;
+    }
+
+    @Given("^Queries Init in mix$")
+    public void initializationOfQueriesInMix() throws Throwable {
+        q = new Queries();
+    }
 
     @Given("^fetching (\\d+) random (.+) vehicles to a list$")
     public void fetchingRandomNotRemovedVehiclesToAList(int length, String message) throws Throwable {
-        q = new Queries();
         boolean removed = false;
 
         if (message.equalsIgnoreCase("removed")) {
@@ -42,7 +54,6 @@ public class mixStepDef {
 
 
     }
-
 
     @Then("^all the vehicles in the list should have removed set to true$")
     public void allTheVehiclesInTheListShouldHaveRemovedSetToTrue() throws Throwable {
@@ -67,14 +78,31 @@ public class mixStepDef {
         }
     }
 
+    @And("^Query all downloaded images of the vehicle in the db with (.+)$")
+    public void queryAllDownloadedImagesOfTheVehicleInTheDb(String uuid) throws Throwable {
 
-    public static List<String> getUuidsList() {
-        uuidList = new ArrayList<String>();
+        dwnImages = q.getDownloadedImagesByUuidAndNotRemoved(uuid);
+        Assert.assertTrue(dwnImages!=null, "No downloaded images found for uuid: "+ uuid);
 
-        for (Vehicle v : vehiclesList) {
-            uuidList.add(v.getUuid());
+    }
+
+    @And("^The priorities of the images should be correct$")
+    public void thePrioritiesOfTheImagesShouldBeCorrect() throws Throwable {
+        Map<Integer, String> priorities = Utils.getPriorities();
+        System.out.println();
+        int count = 0;
+        for(DownloadedImage image: dwnImages)
+        {
+            String externalUrl = image.getExternalUrl();
+            int image_pr = image.getPriority();
+            Assert.assertTrue(externalUrl.contains(priorities.get(image_pr)), String.format("The image has other priority." +
+                    " Url should contain: %s.%nActual external url: %s ",priorities.get(count), externalUrl  ));
+            System.out.println(count + ": "+ priorities.get(count));
+            count++;
         }
 
-        return uuidList;
     }
+
+
+
 }

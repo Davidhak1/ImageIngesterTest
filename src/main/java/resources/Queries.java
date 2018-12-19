@@ -1,11 +1,12 @@
 package resources;
 
+import model.DownloadedImage;
+import model.Vehicle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class Queries {
@@ -68,6 +69,32 @@ public class Queries {
         log.warn("No vehicle found with 'vin' - "+vin + " and not removed" );
         System.out.println("No vehicle found with 'vin' - "+ vin + " and not removed");
         return null;
+    }
+
+    public List<DownloadedImage> getDownloadedImagesByUuidAndNotRemoved(String uuid) {
+        Statement stmt = mysqlCon.getStatement();
+        List<DownloadedImage> dImages = new ArrayList<DownloadedImage>();
+        try {
+            log.debug("Querying vehicle table, finding with 'vin' and Not removed....");
+            ResultSet rs = stmt.executeQuery("select di.* from vehicle_image vi join downloaded_image di on vi.downloaded_image_id = di.id " +
+                    "where vi.vehicle_uuid = '"+uuid+"' AND vi.is_removed=false;");
+
+            while (rs.next()) {
+                dImages.add(new DownloadedImage(rs.getLong(1), rs.getString(2), rs.getString(3),rs.getString(4),
+                        rs.getInt(5),rs.getInt(6), rs.getTimestamp(7),rs.getTimestamp(8)));
+            }
+
+            if(dImages.size()>0)
+                return dImages;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return null;
+
     }
 
     public int getNumberOfVehiclesByVin(String vin){
@@ -161,6 +188,7 @@ public class Queries {
 
         return null;
     }
+
     public List<Vehicle> getVehiclesByRemoved(boolean removed) {
         Statement stmt = mysqlCon.getStatement();
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
@@ -322,7 +350,7 @@ public class Queries {
         int response=0;
         try {
             log.debug("Querying vehicle table, setting removed column to true for uuid: "+ uuid);
-            response = stmt.executeUpdate("update vehicle set removed = false where uuid ='"+uuid+"';");
+            response = stmt.executeUpdate(String.format("update vehicle set removed = false where uuid ='%s';", uuid));
             log.info("The query effected "+ response + "raws");
 
             if(response <1)

@@ -1,17 +1,16 @@
 package resources;
+import model.Vehicle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class Utils {
@@ -151,6 +150,22 @@ public class Utils {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static Map<Integer, String> getPriorities(){
+        Map<Integer, String> priorities = new HashMap<>();
+        priorities.put(0,"angle=45");
+        priorities.put(1,"angle=90");
+        priorities.put(2,"angle=135");
+        priorities.put(3,"angle=180");
+        priorities.put(4,"angle=225");
+        priorities.put(5,"angle=270");
+        priorities.put(6,"angle=315");
+        priorities.put(7,"angle=360");
+        priorities.put(8,"pov=driverdoor");
+        priorities.put(9,"pov=dashboard");
+
+        return priorities;
     }
 
 

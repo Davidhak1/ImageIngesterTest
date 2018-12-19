@@ -1,6 +1,5 @@
-package resources;
+package model;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
