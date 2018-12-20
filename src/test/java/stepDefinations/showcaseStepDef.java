@@ -29,6 +29,7 @@ public class showcaseStepDef extends base {
 
     @When("^Get a random (.+) vehicle that has (.+) number of images mapped to it in db$")
     public void getARandomOemVehicleThatHasQuantityNumberOfImagesMappedToItInDb(String oem, String quantity) throws Throwable {
+
         this.imagesQuantity = 0;
         List<Vehicle> vehicles;
        if(quantity.equalsIgnoreCase("max")){
@@ -60,6 +61,12 @@ public class showcaseStepDef extends base {
        scs.getLocateBttn().click();
     }
 
+    @When("^press on media tab$")
+    public void pressOnMediaTab() throws Throwable {
+        scs.getMediaTab().click();
+    }
+
+
     @Then("^the vin of the showcase should be equal to the vehicle's vin$")
     public void theVinOfTheShowcaseShouldBeEqualToTheVehicleSVin() throws Throwable {
         String scsVin = scs.getVinValue().getText();
@@ -87,4 +94,14 @@ public class showcaseStepDef extends base {
     public void initializeTheBrowserWithChromeForShowcase() throws Throwable {
         driver.close();
     }
+
+    @Then("^We should see the exact amount of images under Vin-Specific stock images$")
+    public void weShouldSeeTheExactAmountOfImagesUnderVinSpecificStockImages() throws Throwable {
+        int stockImagesNumber = scs.getNumberOfStockImages();
+        Assert.assertEquals(stockImagesNumber,imagesQuantity,String.format(" The # of downloaded images doesn't match the # of stock images" +
+                " seen in the showcase under media tab. # shown in showcase: %s.%n# in DB: %s",stockImagesNumber, imagesQuantity));
+        System.out.println("\n Validation under media "+ stockImagesNumber + " : " + imagesQuantity);
+    }
+
+
 }
