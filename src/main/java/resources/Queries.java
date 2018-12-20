@@ -33,6 +33,7 @@ public class Queries {
             }
 
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
 
@@ -60,6 +61,7 @@ public class Queries {
             if(vehicles.size()>0)
                 return vehicles;
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -87,6 +89,7 @@ public class Queries {
             if(dImages.size()>0)
                 return dImages;
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -95,6 +98,33 @@ public class Queries {
 
         return null;
 
+    }
+
+    public List<Vehicle> getVehiclesByOemAndMappedImagesSpecificQuantity(String oem, int quantity) {
+        Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        try {
+            log.debug("Querying vehicle table, finding with 'vin' and Not removed....");
+            ResultSet rs = stmt.executeQuery(String.format("select v.*, count(*) from vehicle_image vi join vehicle v " +
+                    "on v.uuid = vi.vehicle_uuid where v.oem = '%s' group by vehicle_uuid having count(*) = %d;", oem, quantity));
+
+            while (rs.next()) {
+                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9),
+                        rs.getTimestamp(10),rs.getTimestamp(11)));
+            }
+
+            if(vehicles.size()>0)
+                return vehicles;
+        }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return null;
     }
 
     public int getNumberOfVehiclesByVin(String vin){
@@ -109,6 +139,7 @@ public class Queries {
                 count++;
             }
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -131,6 +162,7 @@ public class Queries {
                 count++;
             }
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -153,6 +185,7 @@ public class Queries {
                 count++;
             }
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -180,6 +213,7 @@ public class Queries {
             if(vehicles.size()>0)
                 return vehicles;
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -205,6 +239,7 @@ public class Queries {
             if(vehicles.size()>0)
                 return vehicles;
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -226,6 +261,7 @@ public class Queries {
                 count++;
             }
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -253,6 +289,7 @@ public class Queries {
             if(vehicles.size()>0)
             return vehicles;
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -282,6 +319,7 @@ public class Queries {
 
 
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -309,6 +347,7 @@ public class Queries {
 
 
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -335,6 +374,7 @@ public class Queries {
 
 
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -361,6 +401,7 @@ public class Queries {
 
 
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -386,6 +427,7 @@ public class Queries {
 
 
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -406,6 +448,7 @@ public class Queries {
             }
         }
         catch(Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         try {
@@ -437,6 +480,7 @@ public class Queries {
             }
         }
         catch(Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         try {
@@ -449,6 +493,7 @@ public class Queries {
             log.info(String.format("The Query of deleting vehicles for uuid.length = %d effected %d rows", length, response));
 
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -470,6 +515,7 @@ public class Queries {
             }
 
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally {
@@ -491,13 +537,14 @@ public class Queries {
 
             while (rs.next()) {
                 vehicles.add( new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
-                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
-                        rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime()));
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9),
+                        rs.getTimestamp(10),rs.getTimestamp(11)));
             }
             if(vehicles.size()>0) {
                 return vehicles;
             }
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -521,8 +568,8 @@ public class Queries {
 
             while (rs.next()) {
                 vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
-                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
-                        rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime()));
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9),
+                        rs.getTimestamp(10),rs.getTimestamp(11)));
 
             }
             if(vehicles.size()>0) {
@@ -530,6 +577,7 @@ public class Queries {
                 return vehicles;
             }
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -552,12 +600,13 @@ public class Queries {
 
             while (rs.next()) {
                 vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
-                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9).toLocalDateTime(),
-                        rs.getTimestamp(10).toLocalDateTime(),rs.getTimestamp(11).toLocalDateTime()));
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9),
+                        rs.getTimestamp(10),rs.getTimestamp(11)));
             }
 
             return vehicles;
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
             e.printStackTrace();
         }
         finally{
@@ -570,30 +619,31 @@ public class Queries {
 
     }
 
-    public List<Vehicle> getVehiclesByOemAndStatus(String oem, String status){
+    public List<Vehicle> getVehiclesByOemAndStatusAndCreatedOnNotNull(String oem, String status){
         Statement stmt = mysqlCon.getStatement();
 
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
 
         try {
             log.debug("Querying vehicle table, finding with 'oem' & 'status'....");
-            ResultSet rs = stmt.executeQuery("select * from vehicle where oem = '"+oem+"' AND status = '"+status+ "';");
+            ResultSet rs = stmt.executeQuery("select * from vehicle where removed = false AND  oem = '"+oem+"' " +
+                    "AND status = '"+status+ "' AND created_on is not null;");
 
             while (rs.next()) {
                 vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
-                        rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getTimestamp(9).toLocalDateTime(),
-                        rs.getTimestamp(10).toLocalDateTime(), rs.getTimestamp(11).toLocalDateTime()));
+                        rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8),
+                        rs.getTimestamp(9), rs.getTimestamp(10), rs.getTimestamp(11)));
             }
 
             return vehicles;
         }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS-----------------");
             e.printStackTrace();
         }
         finally{
             mysqlCon.endCon();
         }
-        log.warn("No vehicle found with 'oem', and 'status - " + oem + ", " + status );
-        System.out.println("No vehicle found with 'oem' & 'status' - "+ oem + "\t" + status);
+
         return null;
 
     }

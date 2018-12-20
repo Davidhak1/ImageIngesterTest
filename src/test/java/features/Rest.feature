@@ -37,7 +37,7 @@ Feature: Controller Test
     And I should see json response with the array of equal than <length> items on the filtered $ node
     Examples:
       | path                                                   | length |
-      | AOA_STOCK_IMAGES/uuid/782f56cb0a0e0ae830512b4b435b0958 | 0      |
+      | AOA_STOCK_IMAGES/uuid/782f56cb0a0e0ae830512b4b435b0958 | 7      |
       | BMW_STOCK_IMAGES/uuid/03990f9f0a0d04fe4d6e7a0b383beeb1 | 10     |
 
 
