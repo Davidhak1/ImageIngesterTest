@@ -79,13 +79,15 @@ public class mixStepDef {
         }
     }
 
-    @And("^Query all downloaded images of the vehicle in the db with (.+)$")
-    public void queryAllDownloadedImagesOfTheVehicleInTheDb(String uuid) throws Throwable {
+    @And("^Query all downloaded images of the vehicle in the db$")
+    public void queryAllDownloadedImagesOfTheVehicleInTheDb() throws Throwable {
 
+        String uuid = RestStepDef.restVehicle.getUuid();
         dwnImages = q.getDownloadedImagesByUuidAndNotRemoved(uuid);
         Assert.assertTrue(dwnImages!=null, "No downloaded images found for uuid: "+ uuid);
 
     }
+
 
     @And("^The priorities of the images should be correct$")
     public void thePrioritiesOfTheImagesShouldBeCorrect() throws Throwable {
@@ -103,6 +105,5 @@ public class mixStepDef {
         }
 
     }
-
 
 }

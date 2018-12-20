@@ -17,6 +17,7 @@ import io.restassured.mapper.ObjectMapperSerializationContext;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import model.Vehicle;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
@@ -30,23 +31,22 @@ import resources.ResponseHolder;
 import resources.base;
 
 import javax.security.auth.login.AccountException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.Is.is;
 import static resources.base.initProp;
 
-public class RestStepDef {
+public class RestStepDef{
     ResponseHolder responseHolder;
     Response response;
     RequestSpecification request;
     Map<String, Object> responseMap;
-    Queries q;
+    private static Queries q;
     Map<String, String> body;
     List<String> bodyArray;
+    protected static Vehicle restVehicle;
+    private static List <Vehicle> vehiclesList;
     private String url;
 
     @Given("^Initialization")
@@ -54,6 +54,7 @@ public class RestStepDef {
         initProp();
         request = RestAssured.with();
         System.out.println("\nINIT RESPONSE\n");
+        q = new Queries();
 
 
     }
@@ -70,9 +71,21 @@ public class RestStepDef {
         Assert.assertEquals(200, response.getStatusCode());
     }
 
-    @When("^adding api path for get request (.+)$")
+    @When("^adding api path for get request (.+)$")                                                                     //REMOVE
     public void adding_api_path_for_the_request(String apiUrl) throws Throwable {
         this.url += apiUrl;
+    }
+
+    @When("^adding api endpoint for get request as /vin$")
+    public void adding_api_path_for_the_request_as_vin() throws Throwable {
+
+        this.url = this.url + '/'+ restVehicle.getVin();
+    }
+
+    @When("^adding api endpoint for get request with path based on provider (.+)$")
+    public void addingApiEndpointForGetRequestWithProvider(String oem) throws Throwable {
+       String provider = getProvider(oem);
+        this.url = this.url + provider + "/uuid/"+ restVehicle.getUuid();
     }
 
     @When("^adding api path and body for post requst (.+) with below details")
@@ -117,12 +130,39 @@ public class RestStepDef {
         }
     }
 
+    @When("^adding uuid, provider, vin parameters for vehicle$")
+    public void addingUuidProviderVinParametersFromVehicle() throws Throwable {
+        String provider = getProvider(restVehicle.getOem());
+
+        request.param("uuid",restVehicle.getUuid());
+        request.param("provider",provider);
+        request.param("vin",restVehicle.getVin());
+
+
+    }
+
     @When("^perform the request$")
     public void and_perform_the_request() throws Throwable {
 
         System.out.println(this.url);
         response = request.given().when().get(this.url);
         ResponseHolder.setResponse(response);
+    }
+
+    @When("^get a random vehicle of (.+) with (.+) status and (\\d+) images mapped to it$")
+    public void getARandomVehicleOfBmwWithCompleteStatusAndImagesMappedToIt(String oem, String status, int number) throws Throwable {
+        vehiclesList = q.getVehiclesByOemStatusAndNumberOfImagesMapped(oem,status,number);
+        Assert.assertNotNull(vehiclesList, String.format("No vehicle exist with criteria oem: %s, status: %s images mapped: %d",oem, status, number ));
+
+        restVehicle = vehiclesList.get(new Random().nextInt(vehiclesList.size()));
+        System.out.println("Random chosen vehicle: "+ restVehicle);
+
+    }
+
+    @When("^get a random vhicle with (.+) and (.+) status not removed$")
+    public void getARandomVehicleWithAccountIdAndNotRemoved(String accountId, String status) throws Throwable {
+        vehiclesList = q.getVehiclesByAccountIdStatusNotRemoved(accountId,status);
+        restVehicle = vehiclesList.get(new Random().nextInt(vehiclesList.size()));
     }
 
     @And("^perform the post request$")
@@ -183,6 +223,29 @@ public class RestStepDef {
         }
     }
 
+    @And("^I should see json response with keys on the filtered (.+) node$")
+    public void iShouldSeeJsonResponseWithKeysOnTheFiltered$Node(String filter, DataTable dataTable) throws Throwable {
+
+        List<String> query = new LinkedList<String>();
+
+        for (DataTableRow row : dataTable.getGherkinRows()) {
+            query.add(row.getCells().get(0));
+        }
+
+        ObjectReader reader = new ObjectMapper().reader(Map.class);
+        responseMap = reader.readValue(ResponseHolder.getResponseBody());
+        System.out.println(responseMap);
+
+        //if filter == $ => we should remain in the root of the Object
+        if(!(filter.equals("$"))) {
+            responseMap = (Map<String, Object>) responseMap.get(filter);
+        }
+
+        for (String key : query) {
+            Assert.assertTrue(responseMap.containsKey(key));
+        }
+    }
+
     @And("^vehicle table should have equal number of vehicles for account in the (.+) as the server returns the filtered (.+) node$")
     public void vehicleTableShouldHaveEqualNumberOfVehiclesForAccountInThePathAsTheServerReturns(String path, String filter) throws Throwable {
         String accountId = StringUtils.substringBefore(path,"/");
@@ -205,4 +268,11 @@ public class RestStepDef {
 
 
     }
+
+    private String getProvider(String oem){
+        return  (oem.equalsIgnoreCase("bmw"))?"BMW_STOCK_IMAGES":"AOA_STOCK_IMAGES";
+    }
+
+
+
 }

@@ -13,7 +13,8 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
 
 
   @bmw_end2end
-  @end2end_1
+  @bmw_logics
+  @logic_1
   Scenario Outline: E2E Validating the status and the next_scheduled_time for vehicles that have the same VIN already existing in the db with status initial for bmw
 
     And Get a random <oem> vehicle with <status> and Not removed
@@ -39,10 +40,11 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
 
 #----------------------------------------------------------------------------------------------------------------------------
   @bmw_end2end
-  @end2end_2
+  @bmw_logics
+  @logic_2
   Scenario Outline: E2E Validating the status and the next_scheduled_time for vehicles that have the same VIN already existing in the db with status initial for audi
 
-    And Get the vehicle with <vin> vin Not Removed
+    And Get a random <oem> vehicle with Initial and Not removed
     And Extend the vehicle's original uuid
     And fill in the payload with the <oem> vin and new uuid with force refresh
     And publish the message and wait for 2 seconds
@@ -53,9 +55,9 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
     And set the removed flag to true for myVehicle
 
     Examples:
-      | oem | vin               |
-      | aoa | WAU8DAF89KN003220 |
-      | aoa | WA1FVAF17KD014453 |
+      | oem |
+      | aoa |
+      | aoa |
 
     #WBA4W9C51KAF94395 with complete solution in the Server but partial in the db
     #WBXYJ3C33JEJ82355 With partial solution in the Server but initial in the db
@@ -63,10 +65,11 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
 
 
   @bmw_end2end
-  @end2end_3
+  @bmw_logics
+  @logic_3
   Scenario Outline: E2E Validating the status and the timestamp for vehicles that have the same VIN already existing in the db with status none and partial
 
-    And Get the vehicle with <vin> vin Not Removed
+    And Get a random <oem> vehicle with <status> and Not removed
     And fill in the payload with the <oem> vin and new uuid
     And publish the message and wait for 2 seconds
     Then The new item should exist in the vehicle table and the status should be <status>
@@ -79,11 +82,11 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
 
 
     Examples:
-      | oem | status  | vin               |
-      | bmw | none    | WBXHT3C30J5K24880 |
-      | bmw | partial | WBXHT3C36J5L27981 |
-      | aoa | none    | WA1BCCFS4JR027669 |
-      | aoa | partial | WAU44AFD2JN000766 |
+      | oem | status  |
+      | bmw | none    |
+      | bmw | partial |
+      | aoa | none    |
+      | aoa | partial |
 
 
   # WBXHT3C30J5K24880 - This vehicle has None status in the image_ingester table, and no urls in Sulzer
@@ -94,7 +97,8 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
   #----------------------------------------------------------------------------------------------------------------------------
 
   @bmw_end2end
-  @end2end_4
+  @bmw_logics
+  @logic_4
   Scenario Outline: E2E Test validating the queue and the timestamp for vehicles that already exist in the db with status complete Not Force
 
     And Get a random <oem> vehicle with <status> and Not removed
@@ -121,7 +125,8 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
 #----------------------------------------------------------------------------------------------------------------------------
 
   @bmw_end2end
-  @end2end_5
+  @bmw_logics
+  @logic_5
   Scenario Outline: E2E Test validating the queue and the timestamp for vehicles that already exist in the db with all statuses and Force Refreshed
 
     And Get a random <oem> vehicle with <status> and Not removed
@@ -143,10 +148,12 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
       | aoa | none     |
       | aoa | partial  |
       | aoa | complete |
+
 #----------------------------------------------------------------------------------------------------------------------------
 
   @bmw_end2end
-  @end2end_6
+  @bmw_logics
+  @logic_6
   Scenario Outline: E2E Validating if all the images are mapped to new items that have VINs already existing in the db with completed or partial solutions
 
     And Get a random <oem> vehicle with <status> and Not removed
@@ -177,7 +184,8 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
 #----------------------------------------------------------------------------------------------------------------------------
 
   @bmw_end2end
-  @end2end_7
+  @bmw_logics
+  @logic_7
   Scenario Outline: E2E (BMW only) validating that with force refresh it calls directly to Sulzer & Cozy and doesn't compare the number of images in the system
 
     And Get the vehicle with <vin> vin Not Removed
@@ -201,12 +209,15 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
 #      | bmw | partial  | WBXHT3C36J5L27981 | None           |
 #      | bmw | complete | 5UXTR9C57JLD68868 | None           |
 
-  # WBXHT3C36J5L27981 - This vehicle has Partial status in the image_ingester table, but no image urls in sulzer,
-  # 5UXTR9C57JLD68868 - This vehicle has Complete status in the image_ingester table, but no image urls in sulzer,
+  # WBXHT3C36J5L27981 - This vehicle has Partial status in the vehicle table, but no image urls in sulzer,
+  # 5UXTR9C57JLD68868 - This vehicle has Complete status in the vehicle table, but no image urls in sulzer,
+
+  # Can be deleted later on
 
 #----------------------------------------------------------------------------------------------------------------------------
   @bmw_end2end
-  @end2end_8
+  @bmw_logics
+  @logic_8
   Scenario Outline: E2E (AOA only) validating that with force refresh it calls directly to AOA Servers and doesn't compare the number of images in the system
 
     And Get the vehicle with <vin> vin Not Removed
@@ -229,3 +240,4 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
       # WA1LFAFP8FA011332 - This vehicle has Partial status in the image_ingester table, but no image in AOA Server,
       # WAUG3AFC3JN049188 - This vehicle has Complete status in the image_ingester table, but no image in AOA Server,
 
+      # Can be deleted later

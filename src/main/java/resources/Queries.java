@@ -127,6 +127,62 @@ public class Queries {
         return null;
     }
 
+    public List<Vehicle> getVehiclesByOemStatusAndNumberOfImagesMapped(String oem, String status, int quantity) {
+        Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        try {
+
+            ResultSet rs = stmt.executeQuery(String.format("select v.* from vehicle_image vi join vehicle v on v.uuid = vi.vehicle_uuid  " +
+                    "join downloaded_image di on di.`id` = vi.downloaded_image_id where v.oem = '%s' and " +
+                    "v.status ='%s' group by vehicle_uuid having count(*) = %d;",oem,status,quantity));
+
+            while (rs.next()) {
+                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9),
+                        rs.getTimestamp(10),rs.getTimestamp(11)));
+            }
+
+            if(vehicles.size()>0)
+                return vehicles;
+        }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return null;
+    }
+
+    public List<Vehicle> getVehiclesByAccountIdStatusNotRemoved(String accountId, String status) {
+        Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        try {
+
+            ResultSet rs = stmt.executeQuery(String.format("select * from vehicle where account_id = '%s'" +
+                    " AND status = '%s' AND removed = false;", accountId, status));
+
+            while (rs.next()) {
+                vehicles.add(new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
+                        rs.getString(5),rs.getString(6), rs.getString(7),rs.getString(8),rs.getTimestamp(9),
+                        rs.getTimestamp(10),rs.getTimestamp(11)));
+            }
+
+            if(vehicles.size()>0)
+                return vehicles;
+        }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return null;
+    }
+
+
     public int getNumberOfVehiclesByVin(String vin){
         Statement stmt = mysqlCon.getStatement();
         List<Vehicle> vehicles = new ArrayList<Vehicle>();

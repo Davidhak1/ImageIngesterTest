@@ -45,7 +45,3 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
       | aoa | max      |
       | aoa | min      |
 
-
-
-
-

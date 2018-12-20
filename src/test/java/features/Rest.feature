@@ -9,7 +9,8 @@ Feature: Controller Test
   @end2end_9
   Scenario: Test Sulzer Service returning 10 urls for a bmw vehicle
     Given the server endpoint is https://dsd-int.bmwgroup.com/InventoryServer/cosyEndpoint
-    When adding api path for get request /5UXKR2C56J0Z21267
+    When get a random vehicle of bmw with complete status and 10 images mapped to it
+    When adding api endpoint for get request as /vin
     And adding following headers
       | user         | user             |
       | password     | password         |
@@ -23,7 +24,7 @@ Feature: Controller Test
       | width   | 1280                          |
     And perform the request
     Then the response code should be 200
-#    And I should see json response with the array of 10 items on the filtered imageUrls node
+    And I should see json response with the array of equal than 10 items on the filtered imageUrls node
 
 
   @bmw_end2end
@@ -31,14 +32,15 @@ Feature: Controller Test
   @Endpoint_1
   Scenario Outline: Getting image urls with uuid
     Given the server endpoint is http://vtqainv-imagingservice01.int.dealer.com:9615/images/provider/
-    When adding api path for get request <path>
+    When get a random vehicle of <oem> with complete status and <length> images mapped to it
+    When adding api endpoint for get request with path based on provider <oem>
     And perform the request
     Then the response code should be 200
     And I should see json response with the array of equal than <length> items on the filtered $ node
     Examples:
-      | path                                                   | length |
-      | AOA_STOCK_IMAGES/uuid/782f56cb0a0e0ae830512b4b435b0958 | 7      |
-      | BMW_STOCK_IMAGES/uuid/03990f9f0a0d04fe4d6e7a0b383beeb1 | 10     |
+      | oem | length |
+      | bmw | 10     |
+      | aoa | 7      |
 
 
   @bmw_end2end
@@ -109,23 +111,22 @@ Feature: Controller Test
   @Endpoint_5
   Scenario Outline: Directly Calling Sulzer positive expecting 10 images in the response
     Given the server endpoint is http://vtqainv-imagingservice01.int.dealer.com:9615/image/download/accountId/
+    When get a random vhicle with <accountId> and complete status not removed
     When adding api path for get request <accountId>
-    When adding following parameters
-      | uuid     | <uuid>     |
-      | provider | <provider> |
-      | vin      | <vin>      |
+    When adding uuid, provider, vin parameters for vehicle
     And perform the request
     Then the response code should be 200
     And I should see json response with the array of equal than 10 items on the filtered imageUrls node
-    And I should see json response with pairs on the filtered $ node
-      | uuid          | <uuid>      |
-      | imageProvider | <provider>  |
-      | vin           | <vin>       |
-      | accountId     | <accountId> |
+    And I should see json response with keys on the filtered $ node
+      | uuid          |
+      | imageProvider |
+      | vin           |
+      | accountId     |
+
     Examples:
-      | accountId       | uuid                             | provider         | vin               |
-      | bmwofsanantonio | 0103a9e20a0d0c1469a45a769f3f9b53 | BMW_STOCK_IMAGES | 5UXKR2C56J0Z21267 |
-      | bmwofdallas     | 039910790a0d04fe4d6e7a0b0526cc36 | BMW_STOCK_IMAGES | 5UXTR7C54KLF33720 |
+      | accountId       |
+      | bmwofsanantonio |
+      | bmwofdallas     |
 
 #     TODO Add data for audi, too
 
@@ -136,44 +137,43 @@ Feature: Controller Test
   Scenario Outline: Verifying priorities of the images are in right order
     #firs step -  refreshing the vehicle
     Given the server endpoint is http://vtqainv-imagingservice01.int.dealer.com:9615/image/download/accountId/
+    Given the server endpoint is http://vtqainv-imagingservice01.int.dealer.com:9615/image/download/accountId/
+    When get a random vhicle with <accountId> and complete status not removed
     When adding api path for get request <accountId>
-    When adding following parameters
-      | uuid     | <uuid>     |
-      | provider | <provider> |
-      | vin      | <vin>      |
+    When adding uuid, provider, vin parameters for vehicle
     And perform the request
     Then the response code should be 200
     And I should see json response with the array of equal than 10 items on the filtered imageUrls node
     #second step - verifying the priorities
-    And Query all downloaded images of the vehicle in the db with <uuid>
+    And Query all downloaded images of the vehicle in the db
     And The priorities of the images should be correct
     Examples:
-      | accountId       | uuid                             | provider         | vin               |
-      | bmwofsanantonio | 0103a9e20a0d0c1469a45a769f3f9b53 | BMW_STOCK_IMAGES | 5UXKR2C56J0Z21267 |
-      | bmwofdallas     | 039910790a0d04fe4d6e7a0b0526cc36 | BMW_STOCK_IMAGES | 5UXTR7C54KLF33720 |
+      | accountId       |
+      | bmwofsanantonio |
+      | bmwofdallas     |
 
 
   @bmw_end2end
   @Rest_Assured
   @Endpoint_6
-  Scenario Outline: Directly Calling to the service to get images [expected 10] in the response
+  Scenario Outline: Directly Calling to the service by queues to get images [expected 10] in the response
     Given the server endpoint is http://vtqainv-imagingservice01.int.dealer.com:9615/image/queue-download/accountId/
+    When get a random vhicle with <accountId> and complete status not removed
     When adding api path for get request <accountId>
-    When adding following parameters
-      | uuid     | <uuid>     |
-      | provider | <provider> |
-      | vin      | <vin>      |
+    When adding uuid, provider, vin parameters for vehicle
     And perform the request
     Then the response code should be 200
-    And I should see json response with pairs on the filtered $ node
-      | uuid          | <uuid>      |
-      | imageProvider | <provider>  |
-      | vin           | <vin>       |
-      | accountId     | <accountId> |
+    And I should see json response with keys on the filtered $ node
+      | uuid          |
+      | imageProvider |
+      | vin           |
+      | accountId     |
+
     Examples:
-      | accountId       | uuid                             | provider         | vin               |
-      | bmwofsanantonio | 0103a9e20a0d0c1469a45a769f3f9b53 | BMW_STOCK_IMAGES | 5UXKR2C56J0Z21267 |
-      | bmwofdallas     | 039910790a0d04fe4d6e7a0b0526cc36 | BMW_STOCK_IMAGES | 5UXTR7C54KLF33720 |
+      | accountId         |
+      | bmwofsanantonio   |
+      | bmwofdallas       |
+      | universityaudiaoa |
 
 #     TODO Add data for audi, too
 
