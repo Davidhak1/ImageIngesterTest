@@ -3,8 +3,7 @@ package stepDefinations;
 import com.sun.jna.platform.win32.Advapi32Util;
 import cucumber.api.DataTable;
 import cucumber.api.PendingException;
-import cucumber.api.Scenario;
-import cucumber.api.java.Before;
+
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -12,9 +11,7 @@ import cucumber.api.java.en.When;
 import gherkin.formatter.model.DataTableRow;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.mapper.ObjectMapperDeserializationContext;
-import io.restassured.mapper.ObjectMapperSerializationContext;
-import io.restassured.path.json.JsonPath;
+
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import model.Vehicle;
@@ -22,19 +19,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.BeforeTest;
+
 import resources.Queries;
 import resources.ResponseHolder;
-import resources.base;
 
-import javax.security.auth.login.AccountException;
 import java.util.*;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.core.Is.is;
 import static resources.base.initProp;
 
 public class RestStepDef{

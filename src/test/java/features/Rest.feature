@@ -137,7 +137,6 @@ Feature: Controller Test
   Scenario Outline: Verifying priorities of the images are in right order
     #firs step -  refreshing the vehicle
     Given the server endpoint is http://vtqainv-imagingservice01.int.dealer.com:9615/image/download/accountId/
-    Given the server endpoint is http://vtqainv-imagingservice01.int.dealer.com:9615/image/download/accountId/
     When get a random vhicle with <accountId> and complete status not removed
     When adding api path for get request <accountId>
     When adding uuid, provider, vin parameters for vehicle
