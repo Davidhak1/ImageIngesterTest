@@ -96,12 +96,6 @@ public class RestStepDef{
         this.bodyArray = mixStepDef.getUuidsList();
     }
 
-    @When("^adding api path for get request <path>$")
-    public void addingApiPathForGetRequestPath() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
-
     @And("^adding following headers$")
     public void iAddFollowingHeaders(DataTable dataTable) throws Throwable {
 
@@ -137,7 +131,7 @@ public class RestStepDef{
 
         System.out.println(this.url);
         response = request.given().when().get(this.url);
-        ResponseHolder.setResponse(response);
+        responseHolder.setResponse(response);
     }
 
     @When("^get a random vehicle of (.+) with (.+) status and (\\d+) images mapped to it$")
@@ -159,18 +153,18 @@ public class RestStepDef{
     @And("^perform the post request$")
     public void andPerformThePostRequest() throws Throwable {
         response = request.given().contentType(ContentType.JSON).body(this.body).when().post(this.url);
-        ResponseHolder.setResponse(response);
+        responseHolder.setResponse(response);
     }
 
     @And("^perform the post request sending an array$")
     public void andPerformThePostRequestSendingAnArray() throws Throwable {
         response = request.given().contentType(ContentType.JSON).body(this.bodyArray).when().post(this.url);
-        ResponseHolder.setResponse(response);
+        responseHolder.setResponse(response);
     }
 
     @Then("^the response code should be (\\d+)$")
     public void the_response_code_should_be(int responseCode) throws Throwable {
-        Assert.assertEquals(ResponseHolder.getResponseCode(), responseCode);
+        Assert.assertEquals(responseHolder.getResponseCode(), responseCode);
     }
 
     @Then("^I should see json response with pairs on the filtered (.+) node$")
@@ -183,7 +177,7 @@ public class RestStepDef{
         }
 
         ObjectReader reader = new ObjectMapper().reader(Map.class);
-        responseMap = reader.readValue(ResponseHolder.getResponseBody());
+        responseMap = reader.readValue(responseHolder.getResponseBody());
         System.out.println(responseMap);
 
         //if filter == $ => we should remain in the root of the Object
@@ -201,7 +195,7 @@ public class RestStepDef{
     @Then("^I should see json response with the array of (.+) than (\\d+) items on the filtered (.+) node$")
     public void iShouldSeeJsonResponseWithTheArrayOfItemsOnTheFilteredImageUrlsNode(String comparison, int length, String filter) throws Throwable {
 
-        int actualLen = ResponseHolder.lengthOfArray(filter);
+        int actualLen = responseHolder.lengthOfArray(filter);
 
         if(comparison.equalsIgnoreCase("equal")){
             Assert.assertEquals(actualLen, length, String.format("The lengths supposed, but are not equal. expected: %d | actual: %d", length, actualLen));
@@ -224,7 +218,7 @@ public class RestStepDef{
         }
 
         ObjectReader reader = new ObjectMapper().reader(Map.class);
-        responseMap = reader.readValue(ResponseHolder.getResponseBody());
+        responseMap = reader.readValue(responseHolder.getResponseBody());
         System.out.println(responseMap);
 
         //if filter == $ => we should remain in the root of the Object
@@ -240,9 +234,8 @@ public class RestStepDef{
     @And("^vehicle table should have equal number of vehicles for account in the (.+) as the server returns the filtered (.+) node$")
     public void vehicleTableShouldHaveEqualNumberOfVehiclesForAccountInThePathAsTheServerReturns(String path, String filter) throws Throwable {
         String accountId = StringUtils.substringBefore(path,"/");
-        Queries q = new Queries();
         int dbLen = q.getNumberOfVehiclesByAccountIdNotRemoved(accountId);
-        int serviceLen = ResponseHolder.lengthOfArray(filter);
+        int serviceLen = responseHolder.lengthOfArray(filter);
 
         System.out.println(String.format("%nAccount: %s, DB: %d, API: %d",accountId, dbLen, serviceLen));
         Assert.assertEquals(dbLen, serviceLen ,  String.format("The length of array in the response and DB items do not match. response len: %d, DB len: %d",serviceLen, dbLen));
@@ -250,13 +243,11 @@ public class RestStepDef{
 
     @Then("^vehicle table should have equal number of accounts in the db as in the response at the filtered (.+) node for (.+)$")
     public void vehicleTableShouldHaveEqualNumberOfAccountsInTheDbAsInTheResponseAtTheFiltered$Node(String filter, String oem) throws Throwable {
-        Queries q = new Queries();
         int dbLen = q.getNumberOfAccountsByOem(oem);
-        int serviceLen = ResponseHolder.lengthOfArray(filter);
+        int serviceLen = responseHolder.lengthOfArray(filter);
 
         System.out.println(String.format("%nOem: %s, DB: %d, API: %d",oem, dbLen, serviceLen));
         Assert.assertEquals(dbLen, serviceLen ,  String.format("The length of array in the response and DB items do not match. response len: %d, DB len: %d",serviceLen, dbLen));
-
 
     }
 
