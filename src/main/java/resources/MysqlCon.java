@@ -32,9 +32,9 @@ class MysqlCon{
 
             con=DriverManager.getConnection(
                     mysqlUrl,user,password);
-             stmt=con.createStatement();
+            stmt=con.createStatement();
 
-             return stmt;
+            return stmt;
 
 
         }catch(Exception e){ System.out.println(e);}

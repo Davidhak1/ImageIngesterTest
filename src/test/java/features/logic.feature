@@ -115,8 +115,8 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
       | oem | status   |
       | bmw | complete |
       | aoa | complete |
-#      | bmw | complete |
-#      | aoa | complete |
+      | bmw | complete |
+      | aoa | complete |
 #      | bmw | complete |
 #      | aoa | complete |
 #      | bmw | complete |
@@ -170,8 +170,8 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
       | oem | status   |
       | bmw | partial  |
       | bmw | complete |
-#      | aoa | partial  |
-#      | aoa | complete |
+      | aoa | partial  |
+      | aoa | complete |
 #      | bmw | partial  |
 #      | bmw | complete |
 #      | aoa | partial  |
@@ -206,8 +206,8 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
       | oem | status   | vin               | expectedStatus |
       | bmw | partial  | WBXHT3C36J5L27981 | None           |
       | bmw | complete | 5UXTR9C57JLD68868 | None           |
-#      | bmw | partial  | WBXHT3C36J5L27981 | None           |
-#      | bmw | complete | 5UXTR9C57JLD68868 | None           |
+      | bmw | partial  | WBXHT3C36J5L27981 | None           |
+      | bmw | complete | 5UXTR9C57JLD68868 | None           |
 
   # WBXHT3C36J5L27981 - This vehicle has Partial status in the vehicle table, but no image urls in sulzer,
   # 5UXTR9C57JLD68868 - This vehicle has Complete status in the vehicle table, but no image urls in sulzer,
@@ -234,8 +234,8 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
       | oem | status   | vin               |
       | aoa | partial  | WA1LFAFP8FA011332 |
       | aoa | complete | WAUG3AFC3JN049188 |
-#      | aoa | partial  | WA1LFAFP8FA011332 |
-#      | aoa | complete | WAUG3AFC3JN049188 |
+      | aoa | partial  | WA1LFAFP8FA011332 |
+      | aoa | complete | WAUG3AFC3JN049188 |
 
       # WA1LFAFP8FA011332 - This vehicle has Partial status in the image_ingester table, but no image in AOA Server,
       # WAUG3AFC3JN049188 - This vehicle has Complete status in the image_ingester table, but no image in AOA Server,

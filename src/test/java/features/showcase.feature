@@ -6,6 +6,7 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
 
 
   @bmw_end2end
+  @bmw_showcase
   @showcase_1
   Scenario Outline: Showcase validation of the right vehicle info and the quantity of images
 
@@ -26,6 +27,7 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
 
 
   @bmw_end2end
+  @bmw_showcase
   @showcase_2
   Scenario Outline: Showcase validation the images are being showed under showcase media
 

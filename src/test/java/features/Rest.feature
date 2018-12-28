@@ -162,7 +162,7 @@ Feature: Controller Test
     When adding uuid, provider, vin parameters for vehicle
     And perform the request
     Then the response code should be 200
-    And I should see json response with keys on the filtered $ node
+    And I should see json response with keys on the filtered hey node
       | uuid          |
       | imageProvider |
       | vin           |

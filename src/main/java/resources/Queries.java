@@ -26,9 +26,7 @@ public class Queries {
             while (rs.next()) {
                 return new Vehicle(rs.getString(1), rs.getString(2), rs.getString(3), rs.getBoolean(4),
                         rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8),
-                        (rs.getTimestamp(9) != null) ? rs.getTimestamp(9).toLocalDateTime() : null,
-                        (rs.getTimestamp(10) != null) ? rs.getTimestamp(10).toLocalDateTime() : null,
-                        (rs.getTimestamp(11) != null) ? rs.getTimestamp(11).toLocalDateTime() : null);
+                        rs.getTimestamp(9), rs.getTimestamp(10), rs.getTimestamp(11));
 
             }
 
@@ -181,7 +179,6 @@ public class Queries {
 
         return null;
     }
-
 
     public int getNumberOfVehiclesByVin(String vin){
         Statement stmt = mysqlCon.getStatement();
