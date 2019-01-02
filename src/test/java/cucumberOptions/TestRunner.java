@@ -15,9 +15,9 @@ import com.cucumber.listener.Reporter;
 @CucumberOptions(
 		features = "src/test/java/features",
 		glue="stepDefinations",
-//		tags = {"@bmw_end2end"},
-		tags = {"@Rest_Assured, @bmw_logics, @bmw_showcase"},
-//		tags = {"@bmw_end2end"},
+//		tags = {"@Rest_Assured, @bmw_logics"},
+//		tags = {"@Rest_Assured, @bmw_logics, @bmw_showcase"},
+		tags = {"@bmw_showcase"},
 		plugin={"com.cucumber.listener.ExtentCucumberFormatter:target/html/report.html"},
 		monochrome = true
 )
