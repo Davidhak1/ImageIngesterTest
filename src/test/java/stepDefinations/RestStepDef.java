@@ -10,10 +10,13 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import gherkin.formatter.model.DataTableRow;
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.filter.Filter;
+import io.restassured.http.*;
 
+import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.*;
 import model.Vehicle;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -23,12 +26,17 @@ import org.testng.Assert;
 import resources.Queries;
 import resources.ResponseHolder;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.security.KeyStore;
 import java.util.*;
 
 import static io.restassured.RestAssured.given;
 import static resources.base.initProp;
 
-public class RestStepDef{
+public class RestStepDef {
     ResponseHolder responseHolder;
     Response response;
     RequestSpecification request;
@@ -37,21 +45,21 @@ public class RestStepDef{
     Map<String, String> body;
     List<String> bodyArray;
     protected static Vehicle restVehicle;
-    private static List <Vehicle> vehiclesList;
+    private static List<Vehicle> vehiclesList;
     private String url;
 
     @Given("^Initialization")
     public void initialization() {
         initProp();
         request = RestAssured.with();
-        System.out.println("\nINIT RESPONSE\n");
+        System.out.println("\nINIT Request\n");
         q = new Queries();
 
 
     }
 
     @Given("^the server endpoint is (.+)$")
-    public void theApiHostIsHttpsDsdIntBmwgroupComInventoryServerCosyEndpoint(String host) throws Throwable {
+    public void theServerEndpointIs(String host) throws Throwable {
         this.url = host;
     }
 
@@ -62,7 +70,8 @@ public class RestStepDef{
         Assert.assertEquals(200, response.getStatusCode());
     }
 
-    @When("^adding api path for get request (.+)$")                                                                     //REMOVE
+    @When("^adding api path for get request (.+)$")
+    //REMOVE
     public void adding_api_path_for_the_request(String apiUrl) throws Throwable {
         this.url += apiUrl;
     }
@@ -70,13 +79,13 @@ public class RestStepDef{
     @When("^adding api endpoint for get request as /vin$")
     public void adding_api_path_for_the_request_as_vin() throws Throwable {
 
-        this.url = this.url + '/'+ restVehicle.getVin();
+        this.url = this.url + '/' + restVehicle.getVin();
     }
 
     @When("^adding api endpoint for get request with path based on provider (.+)$")
     public void addingApiEndpointForGetRequestWithProvider(String oem) throws Throwable {
-       String provider = getProvider(oem);
-        this.url = this.url + provider + "/uuid/"+ restVehicle.getUuid();
+        String provider = getProvider(oem);
+        this.url = this.url + provider + "/uuid/" + restVehicle.getUuid();
     }
 
     @When("^adding api path and body for post requst (.+) with below details")
@@ -119,9 +128,9 @@ public class RestStepDef{
     public void addingUuidProviderVinParametersFromVehicle() throws Throwable {
         String provider = getProvider(restVehicle.getOem());
 
-        request.param("uuid",restVehicle.getUuid());
-        request.param("provider",provider);
-        request.param("vin",restVehicle.getVin());
+        request.param("uuid", restVehicle.getUuid());
+        request.param("provider", provider);
+        request.param("vin", restVehicle.getVin());
 
 
     }
@@ -136,18 +145,49 @@ public class RestStepDef{
 
     @When("^get a random vehicle of (.+) with (.+) status and (\\d+) images mapped to it$")
     public void getARandomVehicleOfBmwWithCompleteStatusAndImagesMappedToIt(String oem, String status, int number) throws Throwable {
-        vehiclesList = q.getVehiclesByOemStatusAndNumberOfImagesMapped(oem,status,number);
-        Assert.assertNotNull(vehiclesList, String.format("No vehicle exist with criteria oem: %s, status: %s images mapped: %d",oem, status, number ));
+        vehiclesList = q.getVehiclesByOemStatusAndNumberOfImagesMapped(oem, status, number);
+        Assert.assertNotNull(vehiclesList, String.format("No vehicle exist with criteria oem: %s, status: %s images mapped: %d", oem, status, number));
 
         restVehicle = vehiclesList.get(new Random().nextInt(vehiclesList.size()));
-        System.out.println("Random chosen vehicle: "+ restVehicle);
+        System.out.println("Random chosen vehicle: " + restVehicle);
 
     }
 
     @When("^get a random vhicle with (.+) and (.+) status not removed$")
     public void getARandomVehicleWithAccountIdAndNotRemoved(String accountId, String status) throws Throwable {
-        vehiclesList = q.getVehiclesByAccountIdStatusNotRemoved(accountId,status);
+        vehiclesList = q.getVehiclesByAccountIdStatusNotRemoved(accountId, status);
         restVehicle = vehiclesList.get(new Random().nextInt(vehiclesList.size()));
+        System.out.println(restVehicle);
+    }
+
+    @When("^get a random vhicle with (.+) and (.+) status not removed and Sulzer returns images for it$")
+    public void getARandomVhicleWithAccountIdAndCompleteStatusNotRemovedAndSulzerReturnsImagesForIt(String accountId, String status) throws Throwable {
+        vehiclesList = q.getVehiclesByAccountIdStatusNotRemoved(accountId, status);
+        System.out.println("length of the returned vehicles array--->"+ vehiclesList.size());
+        int i = 0;
+        System.out.println();
+        while (true) {
+            restVehicle = vehiclesList.get(new Random().nextInt(vehiclesList.size()));
+            theServerEndpointIs(String.format("https://dsd-int.bmwgroup.com/InventoryServer/cosyEndpoint/%s" +
+                    "?angle=45,90,135,180,225,270,315,360&pov=driverdoor,dashboard&bkgnd=transparent" +
+                    "&imgtype=png&height=960&width=1280",restVehicle.getVin()));
+            request.header("user", "user");
+            request.header("password","password");
+            and_perform_the_request();
+            System.out.println(++i+") Finding vehicle that has images in Sulzer ---->>");
+            System.out.println("response code --->" + responseHolder.getResponseCode());
+            if (responseHolder.getResponseCode()!=404)
+            {
+                System.out.println("Found ---->>");
+                break;
+            }
+            initialization();
+        }
+        System.out.println(restVehicle);
+        initialization();
+        System.out.println(restVehicle);
+
+
     }
 
     @And("^perform the post request$")
@@ -181,7 +221,7 @@ public class RestStepDef{
         System.out.println(responseMap);
 
         //if filter == $ => we should remain in the root of the Object
-        if(!(filter.equals("$"))) {
+        if (!(filter.equals("$"))) {
             responseMap = (Map<String, Object>) responseMap.get(filter);
         }
 
@@ -197,13 +237,11 @@ public class RestStepDef{
 
         int actualLen = responseHolder.lengthOfArray(filter);
 
-        if(comparison.equalsIgnoreCase("equal")){
+        if (comparison.equalsIgnoreCase("equal")) {
             Assert.assertEquals(actualLen, length, String.format("The lengths supposed, but are not equal. expected: %d | actual: %d", length, actualLen));
-        }
-        else if(comparison.equalsIgnoreCase("less")){
-            Assert.assertTrue(actualLen < length,String.format("The actual length supposed, but is not less than expected. actual: %d | expected: %d", length, actualLen));
-        }
-        else{
+        } else if (comparison.equalsIgnoreCase("less")) {
+            Assert.assertTrue(actualLen < length, String.format("The actual length supposed, but is not less than expected. actual: %d | expected: %d", length, actualLen));
+        } else {
             Assert.assertTrue(actualLen > length, String.format("The actual length supposed, but is not greater than expected. actual: %d | expected: %d", length, actualLen));
         }
     }
@@ -222,7 +260,7 @@ public class RestStepDef{
         System.out.println(responseMap);
 
         //if filter == $ => we should remain in the root of the Object
-        if(!(filter.equals("$"))) {
+        if (!(filter.equals("$"))) {
             responseMap = (Map<String, Object>) responseMap.get(filter);
         }
 
@@ -233,12 +271,12 @@ public class RestStepDef{
 
     @And("^vehicle table should have equal number of vehicles for account in the (.+) as the server returns the filtered (.+) node$")
     public void vehicleTableShouldHaveEqualNumberOfVehiclesForAccountInThePathAsTheServerReturns(String path, String filter) throws Throwable {
-        String accountId = StringUtils.substringBefore(path,"/");
+        String accountId = StringUtils.substringBefore(path, "/");
         int dbLen = q.getNumberOfVehiclesByAccountIdNotRemoved(accountId);
         int serviceLen = responseHolder.lengthOfArray(filter);
 
-        System.out.println(String.format("%nAccount: %s, DB: %d, API: %d",accountId, dbLen, serviceLen));
-        Assert.assertEquals(dbLen, serviceLen ,  String.format("The length of array in the response and DB items do not match. response len: %d, DB len: %d",serviceLen, dbLen));
+        System.out.println(String.format("%nAccount: %s, DB: %d, API: %d", accountId, dbLen, serviceLen));
+        Assert.assertEquals(dbLen, serviceLen, String.format("The length of array in the response and DB items do not match. response len: %d, DB len: %d", serviceLen, dbLen));
     }
 
     @Then("^vehicle table should have equal number of accounts in the db as in the response at the filtered (.+) node for (.+)$")
@@ -246,15 +284,14 @@ public class RestStepDef{
         int dbLen = q.getNumberOfAccountsByOem(oem);
         int serviceLen = responseHolder.lengthOfArray(filter);
 
-        System.out.println(String.format("%nOem: %s, DB: %d, API: %d",oem, dbLen, serviceLen));
-        Assert.assertEquals(dbLen, serviceLen ,  String.format("The length of array in the response and DB items do not match. response len: %d, DB len: %d",serviceLen, dbLen));
+        System.out.println(String.format("%nOem: %s, DB: %d, API: %d", oem, dbLen, serviceLen));
+        Assert.assertEquals(dbLen, serviceLen, String.format("The length of array in the response and DB items do not match. response len: %d, DB len: %d", serviceLen, dbLen));
 
     }
 
-    private String getProvider(String oem){
-        return  (oem.equalsIgnoreCase("bmw"))?"BMW_STOCK_IMAGES":"AOA_STOCK_IMAGES";
+    private String getProvider(String oem) {
+        return (oem.equalsIgnoreCase("bmw")) ? "BMW_STOCK_IMAGES" : "AOA_STOCK_IMAGES";
     }
-
-
 
 }
+

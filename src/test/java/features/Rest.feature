@@ -4,28 +4,6 @@ Feature: Controller Test
     Given Initialization
     And Queries Init in mix
 
-  @bmw_end2end
-  @Rest_Assured
-  @end2end_9
-  Scenario: Test Sulzer Service returning 10 urls for a bmw vehicle
-    Given the server endpoint is https://dsd-int.bmwgroup.com/InventoryServer/cosyEndpoint
-    When get a random vehicle of bmw with complete status and 10 images mapped to it
-    When adding api endpoint for get request as /vin
-    And adding following headers
-      | user         | user             |
-      | password     | password         |
-      | Content-Type | application/json |
-    And adding following parameters
-      | angle   | 45,90,135,180,225,270,315,360 |
-      | pov     | driverdoor,dashboard          |
-      | bkgnd   | transparent                   |
-      | imgtype | png                           |
-      | height  | 960                           |
-      | width   | 1280                          |
-    And perform the request
-    Then the response code should be 200
-    And I should see json response with the array of equal than 10 items on the filtered imageUrls node
-
 
   @bmw_end2end
   @Rest_Assured
@@ -110,13 +88,15 @@ Feature: Controller Test
   @Rest_Assured
   @Endpoint_5
   Scenario Outline: Directly Calling Sulzer positive expecting 10 images in the response
+    When get a random vhicle with <accountId> and complete status not removed and Sulzer returns images for it
     Given the server endpoint is http://vtqainv-imagingservice01.int.dealer.com:9615/image/download/accountId/
-    When get a random vhicle with <accountId> and complete status not removed
     When adding api path for get request <accountId>
     When adding uuid, provider, vin parameters for vehicle
     And perform the request
     Then the response code should be 200
     And I should see json response with the array of equal than 10 items on the filtered imageUrls node
+    #the above line might not be the case, the test might fail because even though sulzer might delete the image urls,
+    #the status will remain Complete in vehicle table
     And I should see json response with keys on the filtered $ node
       | uuid          |
       | imageProvider |
@@ -136,8 +116,8 @@ Feature: Controller Test
   @Endpoint_5.1
   Scenario Outline: Verifying priorities of the images are in right order
     #firs step -  refreshing the vehicle
+    Given get a random vhicle with <accountId> and complete status not removed and Sulzer returns images for it
     Given the server endpoint is http://vtqainv-imagingservice01.int.dealer.com:9615/image/download/accountId/
-    When get a random vhicle with <accountId> and complete status not removed
     When adding api path for get request <accountId>
     When adding uuid, provider, vin parameters for vehicle
     And perform the request
@@ -156,8 +136,8 @@ Feature: Controller Test
   @Rest_Assured
   @Endpoint_6
   Scenario Outline: Directly Calling to the service by queues to get images [expected 10] in the response
+    When get a random vhicle with <accountId> and complete status not removed and Sulzer returns images for it
     Given the server endpoint is http://vtqainv-imagingservice01.int.dealer.com:9615/image/queue-download/accountId/
-    When get a random vhicle with <accountId> and complete status not removed
     When adding api path for get request <accountId>
     When adding uuid, provider, vin parameters for vehicle
     And perform the request
@@ -172,7 +152,28 @@ Feature: Controller Test
       | accountId         |
       | bmwofsanantonio   |
       | bmwofdallas       |
-      | universityaudiaoa |
+
 
 #     TODO Add data for audi, too
 
+  @bmw_end2end
+  @Rest_Assured
+  @end2end_9
+  Scenario: Test Sulzer Service returning 10 urls for a bmw vehicle
+    Given the server endpoint is https://dsd-int.bmwgroup.com/InventoryServer/cosyEndpoint
+    When get a random vehicle of bmw with complete status and 10 images mapped to it
+    When adding api endpoint for get request as /vin
+    And adding following headers
+      | user         | user             |
+      | password     | password         |
+      | Content-Type | application/json |
+    And adding following parameters
+      | angle   | 45,90,135,180,225,270,315,360 |
+      | pov     | driverdoor,dashboard          |
+      | bkgnd   | transparent                   |
+      | imgtype | png                           |
+      | height  | 960                           |
+      | width   | 1280                          |
+    And perform the request
+    Then the response code should be 200
+    And I should see json response with the array of equal than 10 items on the filtered imageUrls node

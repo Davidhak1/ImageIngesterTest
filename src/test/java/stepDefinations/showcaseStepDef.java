@@ -49,6 +49,7 @@ public class showcaseStepDef extends base {
 
     }
 
+
     @And("^fill in the search textbox with the uuid of the vehicle$")
     public void fillInTheSearchTextboxWithTheUuidOfTheVehicle() throws Throwable {
         scs = new ShowcaseSite(driver);
