@@ -131,6 +131,7 @@ public class stepDefinition extends base {
 
         while(repeat) {
             random = vehicles.get(new Random().nextInt(vehicles.size()));
+            System.out.println("temp vehicle uuid = " + random.getUuid());
             repeat = q.getNumberOfVehiclesByVin(random.getVin()) > 1;   //returns true if there are more than 1 vehicle with the same vin
             System.out.println("_____________---------_________---------______-------_____----_____-----__---_-__--_--_-__---__-__-__---__-_--_--__-_---__-----_____----_____-------______---------_________---------_____________");
 

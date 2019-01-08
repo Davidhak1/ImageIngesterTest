@@ -15,7 +15,7 @@ import com.cucumber.listener.Reporter;
 @CucumberOptions(
 		features = "src/test/java/features",
 		glue="stepDefinations",
-//		tags = {"@Rest_Assured, @bmw_logics"},
+//		tags = {" @bmw_logics"},
 		tags = {"@Rest_Assured, @bmw_logics, @bmw_showcase"},
 //		tags = {"@bmw_showcase"},
 		plugin={"com.cucumber.listener.ExtentCucumberFormatter:target/html/report.html"},

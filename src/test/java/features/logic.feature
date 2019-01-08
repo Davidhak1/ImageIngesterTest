@@ -2,10 +2,10 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
 
   Background:
     Given Initialize the browser with chrome
-    And Clean vehicle and vehicle_image tables from data created during prior tests
     And Navigate to "http://vtqase-platrabbitmq01.dyn.dealer.ddc:15672/#/channels"
     When User enters username and password and logs in
     And set the removed flag to true for vehicles having uuid length greater than 35
+    And Clean vehicle and vehicle_image tables from data created during prior tests
     And generate a new uuid
     And Go to queues
     And Choose image-action-queue
@@ -163,7 +163,6 @@ Feature: E2E Testing image ingester logic for bmw & aoa including rabbitMQ and S
     And Vehicles with old and new uuids and should have have equal number of images mapped
     And close the browser
     And set the removed flag to true for myVehicle
-
 
 
     Examples:

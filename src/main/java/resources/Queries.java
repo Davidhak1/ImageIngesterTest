@@ -203,6 +203,29 @@ public class Queries {
 
     }
 
+    public int getNumberOfVehiclesByVinAndNotRemoved(String vin){
+        Statement stmt = mysqlCon.getStatement();
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        int count=0;
+        try {
+            log.debug("Querying vehicle table, finding number of vehicles for vin = " + vin + "...");
+            ResultSet rs = stmt.executeQuery(String.format("select * from vehicle where vin = '%s' and removed=false;", vin));
+
+            while (rs.next()) {
+                count++;
+            }
+        }catch (Exception e){
+            System.out.println("------------------EXCEPTION IN THE QUERIES CLASS------------------");
+            e.printStackTrace();
+        }
+        finally{
+            mysqlCon.endCon();
+        }
+
+        return count;
+
+    }
+
     public int getNumberOfVehiclesByAccountIdNotRemoved(String accountId){
         Statement stmt = mysqlCon.getStatement();
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
