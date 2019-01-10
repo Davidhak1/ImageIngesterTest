@@ -81,7 +81,7 @@ public class showcaseStepDef extends base {
         System.out.println(linksInShowcase + " : " + imagesQuantity) ;
 
         Assert.assertEquals(linksInShowcase,imagesQuantity,String.format("The quantity of images in showcase and for my vehicle don't match." +
-                " Showcase: %d , Myvehicle: %d ",linksInShowcase, imagesQuantity));
+                " Showcase: %d , Myvehicle: %d for uuid %s",linksInShowcase, imagesQuantity, showVehicle.getUuid()));
     }
 
 
